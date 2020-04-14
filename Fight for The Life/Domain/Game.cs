@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,13 +15,13 @@ namespace Fight_for_The_Life.Domain
         public int Score => (int) ((StartVelocity * GameTimeInSeconds +
                                     Acceleration * GameTimeInSeconds * GameTimeInSeconds / 2) * 5);
         public double VelocityInPixelsPerSecond => StartVelocity + Acceleration * GameTimeInSeconds;
-        public readonly Timer Timer;
-        public int GameTimeInMilliseconds { get; private set; }
-        public double GameTimeInSeconds => GameTimeInMilliseconds / 1000;
+        private readonly Timer Timer;
+        private int GameTimeInMilliseconds { get; set; }
+        private double GameTimeInSeconds => GameTimeInMilliseconds / 1000;
         public static readonly int FieldWidth = 1920;
         public static readonly int FieldHeight = 715;
-        public static readonly int StartVelocity = (int) (FieldWidth / 4);
-        public static readonly double Acceleration = 1.05;
+        private static readonly int StartVelocity = (int) (FieldWidth / 4);
+        private static readonly double Acceleration = 1.05;
         public readonly Sperm Player = new Sperm();
 
         public Game()
@@ -62,45 +63,65 @@ namespace Fight_for_The_Life.Domain
         public Point Location { get; }
     }
 
+    class OtherSperm
+    {
+        public Point Location { get; }
+    }
+
     class Enemy
     {
+        public Point Location => new Point(Game.FieldWidth - 1 - (int) (Velocity * TimeAliveIsSeconds), Y);
+        protected int Y;
+        protected Timer Timer;
+        protected double Velocity;
+        protected int TimeAliveIsSeconds;
+        private static double velocityCoefficient;
+
+        public Enemy(int y, double spermVelocity)
+        { 
+        }
     }
 
     class Blood : Enemy
     {
-        public readonly double Velocity;
-        public Point Location { get; }
+        private const double velocityCoefficient = 1.2;
 
-        public Blood(double spermVelocity)
+        public Blood(int y, double spermVelocity) : base(y, spermVelocity)
         {
-            Velocity = spermVelocity * 1.2;
+            Y = y;
+            Velocity = spermVelocity * velocityCoefficient;
+            Timer = new Timer() { Interval = 1000 };
+            Timer.Tick += (sender, args) => TimeAliveIsSeconds++;
+            Timer.Start();
         }
-    }
-
-    class OtherSperm : Enemy
-    {
-        public Point Location { get; }
     }
 
     class IntrauterineDevice : Enemy
     {
-        public Point Location { get; }
-        public readonly double Velocity;
+        private const double velocityCoefficient = 1;
 
-        public IntrauterineDevice(double spermVelocity)
+        public IntrauterineDevice(int y, double spermVelocity) : base(y, spermVelocity)
         {
-            Velocity = spermVelocity;
+            Y = y;
+            Velocity = spermVelocity * velocityCoefficient;
+            Timer = new Timer() { Interval = 1000 };
+            Timer.Tick += (sender, args) => TimeAliveIsSeconds++;
+            Timer.Start();
         }
     }
 
     class BirthControl : Enemy
     {
-        public Point Location { get; }
-        public readonly double Velocity;
+        private const double velocityCoefficient = 1.5;
 
-        public BirthControl(double spermVelocity)
+
+        public BirthControl(int y, double spermVelocity) : base(y, spermVelocity)
         {
-            Velocity = spermVelocity * 1.5;
+            Y = y;
+            Velocity = spermVelocity * velocityCoefficient;
+            Timer = new Timer() { Interval = 1000 };
+            Timer.Tick += (sender, args) => TimeAliveIsSeconds++;
+            Timer.Start();
         }
     }
 }
