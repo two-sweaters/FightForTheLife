@@ -30,10 +30,28 @@ namespace Fight_for_The_Life.Domain
 
     class Sperm
     {
-        public Point Location { get; }
+        public Point Location { get; set; }
         private readonly Core Core = new Core();
         public bool HasCore => Location == Core.Location;
 
+        public Sperm()
+        {
+            Location = new Point(0, 357);
+        }
+
+        public void MoveUp()
+        {
+            var location = new Point(Location.X, Location.Y - 71);
+            if (location.Y >= 0) 
+                Location = location;
+        }
+
+        public void MoveDown()
+        {
+            var location = new Point(Location.X, Location.Y + 71);
+            if (location.Y < 715)
+                Location = location;
+        }
     }
 
     class Core
