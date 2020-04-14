@@ -1,7 +1,6 @@
 Fight for The Life: Natural Selection
 
-Платформер
-
+Ранер
 
 Игрок управляет сперматозоидом. 
 
