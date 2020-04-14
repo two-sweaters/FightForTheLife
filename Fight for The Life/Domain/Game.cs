@@ -11,13 +11,16 @@ namespace Fight_for_The_Life.Domain
     class Game
     {
         // очки считаются следующим образом: пройденные главным героем пиксели * 5
-        public int Score => (int) ((178 * GameTimeInSeconds + 1.05 * GameTimeInSeconds * GameTimeInSeconds / 2) * 5);
-        public double VelocityInPixelsPerSecond => 178 + 1.05 * GameTimeInSeconds;
+        public int Score => (int) ((StartVelocity * GameTimeInSeconds +
+                                    Acceleration * GameTimeInSeconds * GameTimeInSeconds / 2) * 5);
+        public double VelocityInPixelsPerSecond => StartVelocity + Acceleration * GameTimeInSeconds;
         public readonly Timer Timer;
         public int GameTimeInMilliseconds { get; private set; }
         public double GameTimeInSeconds => GameTimeInMilliseconds / 1000;
-        public readonly int FieldWidth = 1920;
-        public readonly int FieldHeight = 715;
+        public static readonly int FieldWidth = 1920;
+        public static readonly int FieldHeight = 715;
+        public static readonly int StartVelocity = (int) (FieldWidth / 4);
+        public static readonly double Acceleration = 1.05;
         public readonly Sperm Player = new Sperm();
 
         public Game()
@@ -36,20 +39,20 @@ namespace Fight_for_The_Life.Domain
 
         public Sperm()
         {
-            Location = new Point(0, 357);
+            Location = new Point(0, Game.FieldHeight / 2);
         }
 
         public void MoveUp()
         {
-            var location = new Point(Location.X, Location.Y - 71);
+            var location = new Point(Location.X, Location.Y - Game.FieldHeight / 10);
             if (location.Y >= 0) 
                 Location = location;
         }
 
         public void MoveDown()
         {
-            var location = new Point(Location.X, Location.Y + 71);
-            if (location.Y < 715)
+            var location = new Point(Location.X, Location.Y + Game.FieldHeight / 10);
+            if (location.Y < Game.FieldHeight)
                 Location = location;
         }
     }
