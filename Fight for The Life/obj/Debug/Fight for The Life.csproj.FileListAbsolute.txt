@@ -1,0 +1,7 @@
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Fight for The Life\bin\Debug\Fight for The Life.exe.config
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Fight for The Life\bin\Debug\Fight for The Life.exe
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Fight for The Life\bin\Debug\Fight for The Life.pdb
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Fight for The Life\obj\Debug\Fight for The Life.csprojAssemblyReference.cache
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Fight for The Life\obj\Debug\Fight for The Life.csproj.CoreCompileInputs.cache
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Fight for The Life\obj\Debug\Fight for The Life.exe
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Fight for The Life\obj\Debug\Fight for The Life.pdb

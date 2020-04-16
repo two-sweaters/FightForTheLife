@@ -1,0 +1,14 @@
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\obj\Debug\Tests.csprojAssemblyReference.cache
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\obj\Debug\Tests.csproj.CoreCompileInputs.cache
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\Tests.exe.config
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\Tests.exe
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\Tests.pdb
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\Fight for The Life.exe
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\nunit.framework.dll
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\Fight for The Life.pdb
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\Fight for The Life.exe.config
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\nunit.framework.pdb
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\bin\Debug\nunit.framework.xml
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\obj\Debug\Tests.csproj.CopyComplete
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\obj\Debug\Tests.exe
+C:\Users\ivanp\OneDrive\Рабочий стол\Fight for The Life\Tests\obj\Debug\Tests.pdb

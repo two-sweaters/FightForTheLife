@@ -9,46 +9,45 @@ using System.Windows.Forms;
 
 namespace Fight_for_The_Life.Domain
 {
-    class Game
+    public class Game
     {
-        // очки считаются следующим образом: пройденные главным героем пиксели * 5
-        public int Score
-        {
-            get
-            {
-                var segmentsAmount = (int) (GameTimeInSeconds / 15);
-                var lastSegmentTime = GameTimeInSeconds % 60;
-                var distance = 0;
-                var velocity = StartVelocity;
-                for (var segmentsCount = 0; segmentsCount < segmentsAmount; segmentsCount++)
-                {
-                    distance += (int) (velocity * 15);
-                    velocity *= AccelerationCoefficient;
-                }
-                distance += (int) (lastSegmentTime * velocity);
-                return distance * 5;
-            }
-        }
         public double VelocityInPixelsPerSecond =>
             Math.Pow(AccelerationCoefficient, (int) (GameTimeInSeconds / 15)) * StartVelocity;
-        private readonly Timer Timer;
-        private int GameTimeInMilliseconds { get; set; }
+
+        private int GameTimeInMilliseconds => (int) (DateTime.Now - GameStartTime).TotalMilliseconds;
         private double GameTimeInSeconds => GameTimeInMilliseconds / 1000;
+        private readonly DateTime GameStartTime;
         public static readonly int FieldWidth = 1920;
         public static readonly int FieldHeight = 715;
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private static readonly double AccelerationCoefficient = 1.25;
         public readonly Sperm Player = new Sperm();
+        // очки считаются следующим образом: пройденные главным героем пиксели * 5
+        public int Score
+        {
+            get
+            {
+                var segmentsAmount = (int)(GameTimeInSeconds / 15);
+                var lastSegmentTime = GameTimeInSeconds % 60;
+                var distance = 0;
+                var velocity = StartVelocity;
+                for (var segmentsCount = 0; segmentsCount < segmentsAmount; segmentsCount++)
+                {
+                    distance += (int)(velocity * 15);
+                    velocity *= AccelerationCoefficient;
+                }
+                distance += (int)(lastSegmentTime * velocity);
+                return distance * 5;
+            }
+        }
 
         public Game()
         {
-            Timer = new Timer {Interval = 1};
-            Timer.Tick += (sender, args) => GameTimeInMilliseconds++;
-            Timer.Start();
+            GameStartTime = DateTime.Now;
         }
     }
 
-    class Sperm
+    public class Sperm
     {
         public Point Location { get; set; }
         private readonly Core Core = new Core();
@@ -57,6 +56,13 @@ namespace Fight_for_The_Life.Domain
         public Sperm()
         {
             Location = new Point(0, Game.FieldHeight / 2);
+        }
+
+        public Sperm(int y)
+        {
+            if (y > Game.FieldHeight - 1 || y < 0)
+                throw new ArgumentException("Y was outside the game field!");
+            Location = new Point(0, y);
         }
 
         public void MoveUp()
@@ -84,60 +90,58 @@ namespace Fight_for_The_Life.Domain
         public Point Location { get; }
     }
 
-    class Enemy
+    public class Enemy
     {
-        public Point Location => new Point(Game.FieldWidth - 1 - (int) (Velocity * TimeAliveIsSeconds), Y);
+        public Point Location => new Point(Game.FieldWidth - 1 - (int)(Velocity * TimeAliveIsSeconds), Y);
         protected int Y;
-        protected Timer Timer;
         protected double Velocity;
-        protected int TimeAliveIsSeconds;
-        private static double velocityCoefficient;
+        protected double TimeAliveIsSeconds => (DateTime.Now - CreatingTime).TotalSeconds;
+        protected DateTime CreatingTime;
 
         public Enemy(int y, double spermVelocity)
         { 
         }
     }
 
-    class Blood : Enemy
+    public class Blood : Enemy
     {
-        private const double velocityCoefficient = 1.2;
+        private static double velocityCoefficient = 1.2;
 
         public Blood(int y, double spermVelocity) : base(y, spermVelocity)
         {
+            if (y > Game.FieldHeight - 1 || y < 0)
+                throw new ArgumentException("Y was outside the game field!");
             Y = y;
+            CreatingTime = DateTime.Now;
             Velocity = spermVelocity * velocityCoefficient;
-            Timer = new Timer() { Interval = 1000 };
-            Timer.Tick += (sender, args) => TimeAliveIsSeconds++;
-            Timer.Start();
         }
     }
 
-    class IntrauterineDevice : Enemy
+    public class IntrauterineDevice : Enemy
     {
-        private const double velocityCoefficient = 1;
 
         public IntrauterineDevice(int y, double spermVelocity) : base(y, spermVelocity)
         {
+            if (y > Game.FieldHeight - 1 || y < 0)
+                throw new ArgumentException("Y was outside the game field!");
             Y = y;
-            Velocity = spermVelocity * velocityCoefficient;
-            Timer = new Timer() { Interval = 1000 };
-            Timer.Tick += (sender, args) => TimeAliveIsSeconds++;
-            Timer.Start();
+            CreatingTime = DateTime.Now;
+            Velocity = spermVelocity;
         }
     }
 
-    class BirthControl : Enemy
+    public class BirthControl : Enemy
     {
         private const double velocityCoefficient = 1.5;
 
 
         public BirthControl(int y, double spermVelocity) : base(y, spermVelocity)
         {
+            if (y > Game.FieldHeight - 1 || y < 0)
+                throw new ArgumentException("Y was outside the game field!");
             Y = y;
+            CreatingTime = DateTime.Now;
             Velocity = spermVelocity * velocityCoefficient;
-            Timer = new Timer() { Interval = 1000 };
-            Timer.Tick += (sender, args) => TimeAliveIsSeconds++;
-            Timer.Start();
         }
     }
 }
