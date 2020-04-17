@@ -22,22 +22,25 @@ namespace Fight_for_The_Life.Domain
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private static readonly double AccelerationCoefficient = 1.25;
         public readonly Sperm Player = new Sperm();
-        // очки считаются следующим образом: пройденные главным героем пиксели * 5
+        // пришлось изменить модель подсчета очков,
+        // так как в прошлой версии очки зависили от разрешения окна
+        // теперь очки = кол-во пройденых окон * 1000
         public int Score
         {
             get
             {
                 var segmentsAmount = (int)(GameTimeInSeconds / 15);
                 var lastSegmentTime = GameTimeInSeconds % 60;
-                var distance = 0;
+                var distance = 0.0;
                 var velocity = StartVelocity;
                 for (var segmentsCount = 0; segmentsCount < segmentsAmount; segmentsCount++)
                 {
                     distance += (int)(velocity * 15);
                     velocity *= AccelerationCoefficient;
                 }
-                distance += (int)(lastSegmentTime * velocity);
-                return distance * 5;
+                distance += lastSegmentTime * velocity;
+                var screensAmount = distance / FieldWidth;
+                return (int) (screensAmount * 1000);
             }
         }
 
@@ -105,7 +108,7 @@ namespace Fight_for_The_Life.Domain
 
     public class Blood : Enemy
     {
-        private static double velocityCoefficient = 1.2;
+        private const double VelocityCoefficient = 1.2;
 
         public Blood(int y, double spermVelocity) : base(y, spermVelocity)
         {
@@ -113,7 +116,7 @@ namespace Fight_for_The_Life.Domain
                 throw new ArgumentException("Y was outside the game field!");
             Y = y;
             CreatingTime = DateTime.Now;
-            Velocity = spermVelocity * velocityCoefficient;
+            Velocity = spermVelocity * VelocityCoefficient;
         }
     }
 
@@ -132,7 +135,7 @@ namespace Fight_for_The_Life.Domain
 
     public class BirthControl : Enemy
     {
-        private const double velocityCoefficient = 1.5;
+        private const double VelocityCoefficient = 1.5;
 
 
         public BirthControl(int y, double spermVelocity) : base(y, spermVelocity)
@@ -141,7 +144,7 @@ namespace Fight_for_The_Life.Domain
                 throw new ArgumentException("Y was outside the game field!");
             Y = y;
             CreatingTime = DateTime.Now;
-            Velocity = spermVelocity * velocityCoefficient;
+            Velocity = spermVelocity * VelocityCoefficient;
         }
     }
 }

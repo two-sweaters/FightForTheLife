@@ -39,7 +39,7 @@ namespace Tests
         }
 
         [Test]
-        public void ShouldRightCalculateLocation()
+        public void ShouldCalculateRightLocation()
         {
             var intrauterineDevice = new IntrauterineDevice(0, 1);
             Thread.Sleep(2000);

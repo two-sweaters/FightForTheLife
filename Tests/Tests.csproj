@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameTests.cs" />
     <Compile Include="SpermTests.cs" />
     <Compile Include="IntrauterineDeviceTests.cs" />
     <Compile Include="Program.cs" />
