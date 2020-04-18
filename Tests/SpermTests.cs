@@ -26,17 +26,7 @@ namespace Tests
         [Test]
         public void ShouldThrowArgumentException_WhenCreatingOutsideField()
         {
-            try
-            {
-                var sperm = new Sperm(Game.FieldHeight);
-            }
-            catch (ArgumentException)
-            {
-            }
-            catch
-            {
-                Assert.Fail();
-            }
+            Assert.Catch(typeof(ArgumentException), () => new Sperm(Game.FieldHeight));
         }
     }
 }

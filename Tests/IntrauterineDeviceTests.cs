@@ -16,34 +16,20 @@ namespace Tests
         public void ShouldNotMoving_WhenCreatingWithZeroVelocity()
         {
             var intrauterineDevice = new IntrauterineDevice(0, 0);
-            Thread.Sleep(1000);
-            Assert.AreEqual(intrauterineDevice.Location, new IntrauterineDevice(0, 0).Location);
+            Assert.AreEqual(new Point(Game.FieldWidth - 1, 0), intrauterineDevice.GetLocation(1));
         }
 
         [Test]
         public void ShouldThrowArgumentException_WhenCreatingOutsideField()
         {
-            try
-            {
-                var intrauterineDevice = new IntrauterineDevice(Game.FieldHeight, 0);
-
-            }
-            catch (ArgumentException)
-            {
-            }
-            catch
-            {
-                Assert.Fail();
-            }
-
+            Assert.Catch(typeof(ArgumentException), () => new IntrauterineDevice(Game.FieldHeight, 0));
         }
 
         [Test]
         public void ShouldCalculateRightLocation()
         {
             var intrauterineDevice = new IntrauterineDevice(0, 1);
-            Thread.Sleep(2000);
-            Assert.AreEqual(new Point(Game.FieldWidth - 3, 0), intrauterineDevice.Location);
+            Assert.AreEqual(new Point(Game.FieldWidth - 3, 0), intrauterineDevice.GetLocation(2));
         }
     }
 }

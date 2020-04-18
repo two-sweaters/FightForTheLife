@@ -16,23 +16,21 @@ namespace Tests
         public void ShouldCalculateRightVelocity_AfterCreation()
         {
             var game = new Game();
-            Assert.AreEqual(480, game.VelocityInPixelsPerSecond);
+            Assert.AreEqual(480, game.GetVelocityInPixelsPerSecond(0));
         }
 
         [Test]
         public void ShouldCalculateRightVelocity_15SecondsAfterCreation()
         {
             var game = new Game();
-            Thread.Sleep(15000);
-            Assert.AreEqual(600, game.VelocityInPixelsPerSecond);
+            Assert.AreEqual(600, game.GetVelocityInPixelsPerSecond(15));
         }
 
         [Test]
         public void ShouldCalculateRightScore()
         {
             var game = new Game();
-            Thread.Sleep(5000);
-            Assert.AreEqual(1250, game.Score);
+            Assert.AreEqual(1250, game.GetScore(5));
         }
     }
 }
