@@ -15,9 +15,9 @@ namespace Tests
         [Test]
         public void ShouldNotMovingOutsideTheField()
         {
-            var sperm = new Sperm(Game.FieldHeight - 1);
+            var sperm = new Sperm(Game.FieldHeight - Sperm.ModelHeight - 1);
             sperm.MoveDown();
-            Assert.AreEqual(new Point(0, Game.FieldHeight - 1), sperm.Location);
+            Assert.AreEqual(new Point(0, Game.FieldHeight - Sperm.ModelHeight - 1), sperm.Location);
             sperm = new Sperm(0);
             sperm.MoveUp();
             Assert.AreEqual(Point.Empty, sperm.Location);
@@ -27,6 +27,14 @@ namespace Tests
         public void ShouldThrowArgumentException_WhenCreatingOutsideField()
         {
             Assert.Catch(typeof(ArgumentException), () => new Sperm(Game.FieldHeight));
+        }
+
+        [Test]
+        public void ShouldCreatingWithRightSize()
+        {
+            var sperm = new Sperm();
+            Assert.AreEqual(71, sperm.Model.Height);
+            Assert.AreEqual(326, sperm.Model.Width);
         }
     }
 }

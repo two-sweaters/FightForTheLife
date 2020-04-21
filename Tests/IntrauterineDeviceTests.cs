@@ -31,5 +31,14 @@ namespace Tests
             var intrauterineDevice = new IntrauterineDevice(0, 1);
             Assert.AreEqual(new Point(Game.FieldWidth - 3, 0), intrauterineDevice.GetLocation(2));
         }
+
+        [Test]
+        public void ShouldCreatingWithRightSize()
+        {
+            var intrauterineDevice = new IntrauterineDevice(0, 1);
+            var model = intrauterineDevice.GetModel(0);
+            Assert.AreEqual(99, model.Height);
+            Assert.AreEqual(780, model.Width);
+        }
     }
 }
