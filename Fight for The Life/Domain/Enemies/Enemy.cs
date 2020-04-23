@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Fight_for_The_Life.Domain
+namespace Fight_for_The_Life.Domain.Enemies
 {
     public class Enemy
     {
@@ -8,10 +8,6 @@ namespace Fight_for_The_Life.Domain
         protected double Velocity;
         protected double WidthCoefficient;
         protected double HeightCoefficient;
-
-        protected Enemy(int y, double spermVelocity)
-        { 
-        }
 
         public virtual Point GetLocation(double timeAliveInSeconds)
         {

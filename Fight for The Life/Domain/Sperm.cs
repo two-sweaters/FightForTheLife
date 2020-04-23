@@ -5,10 +5,12 @@ namespace Fight_for_The_Life.Domain
 {
     public class Sperm
     {
-        public Point Location { get; set; }
-        private readonly Core Core = new Core();
-        public static readonly int ModelHeight = (int) (Game.FieldHeight * 0.1);
-        public static readonly int ModelWidth = (int) (Game.FieldWidth * 0.17);
+        public Point Location { get; private set; }
+        public readonly Core Core = new Core();
+        public const double HeightCoefficient = 0.1;
+        public const double WidthCoefficient = 0.17;
+        public static readonly int ModelHeight = (int) (Game.FieldHeight * HeightCoefficient);
+        public static readonly int ModelWidth = (int) (Game.FieldWidth * WidthCoefficient);
         public Rectangle Model => new Rectangle(Location.X, Location.Y, 
             ModelWidth, ModelHeight);
 

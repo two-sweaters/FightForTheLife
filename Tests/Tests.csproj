@@ -52,7 +52,7 @@
   <ItemGroup>
     <Compile Include="GameTests.cs" />
     <Compile Include="SpermTests.cs" />
-    <Compile Include="IntrauterineDeviceTests.cs" />
+    <Compile Include="BloodTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

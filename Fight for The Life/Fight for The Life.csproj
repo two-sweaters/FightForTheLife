@@ -48,13 +48,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\Enemys\BirthControl.cs" />
-    <Compile Include="Domain\Enemys\Blood.cs" />
+    <Compile Include="Domain\Enemies\BirthControl.cs" />
+    <Compile Include="Domain\Enemies\Blood.cs" />
     <Compile Include="Domain\Core.cs" />
-    <Compile Include="Domain\Enemys\Enemy.cs" />
+    <Compile Include="Domain\Enemies\Enemy.cs" />
     <Compile Include="Domain\Game.cs" />
-    <Compile Include="Domain\Enemys\IntrauterineDevice.cs" />
-    <Compile Include="Domain\Enemys\OtherSperm.cs" />
+    <Compile Include="Domain\Enemies\IntrauterineDevice.cs" />
+    <Compile Include="Domain\Enemies\OtherSperm.cs" />
     <Compile Include="Domain\Sperm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
