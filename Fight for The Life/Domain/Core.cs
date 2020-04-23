@@ -12,7 +12,7 @@ namespace Fight_for_The_Life.Domain
         private static readonly int ModelHeight = (int) (Game.FieldHeight * HeightCoefficient);
         private static readonly int ModelWidth = (int) (Game.FieldWidth * WidthCoefficient);
         private Point StoppedPosition { get; set; }
-        private Point ShotPosition { get; set; }
+        public Point ShotPosition { get; private set; }
 
         public Core(Sperm sperm)
         {
@@ -25,7 +25,7 @@ namespace Fight_for_The_Life.Domain
 
             if (State == CoreState.InsideSperm)
                 location =  new Point((int)(sperm.Location.X + Game.FieldWidth * 0.11458),
-                    (int)(sperm.Location.X + Game.FieldWidth * 0.00699));
+                    (int)(sperm.Location.Y + Game.FieldHeight * 0.00699));
 
             else if (State == CoreState.Stopped)
                 location = StoppedPosition;
