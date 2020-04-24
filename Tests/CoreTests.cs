@@ -39,10 +39,18 @@ namespace Tests
         }
 
         [Test]
-        public void Shot_ShouldChangeCoreState()
+        public void Shot_ShouldChangeCoreState_IfCoreInsideSperm()
         {
             core.Shot(0);
             Assert.AreEqual(CoreState.Flying, core.State);
+        }
+
+        [Test]
+        public void Shot_ShouldNotChangeCoreState_IfCoreIsNotInsideSperm()
+        {
+            core.Shot(0);
+            core.Stop(0, 0);
+            Assert.AreEqual(CoreState.Stopped, core.State);
         }
 
         [Test]
@@ -58,6 +66,47 @@ namespace Tests
             core.Shot(10);
             Assert.AreEqual(new Point(core.ShotPosition.X + 300, core.ShotPosition.Y),
                 core.GetModel(10).Location);
+        }
+
+        [Test]
+        public void Stop_ShouldChangeCoreState()
+        {
+            core.Shot(0);
+            core.Stop(0, 0);
+            Assert.AreEqual(CoreState.Stopped, core.State);
+        }
+
+        [Test]
+        public void Stop_ShouldNotChangeCoreState_IfCoreIsNotFlying()
+        {
+            core.Stop(0, 0);
+            Assert.AreEqual(CoreState.InsideSperm, core.State);
+        }
+
+        [Test]
+        public void GetModel_ShouldCalculateRightLocation_AfterStop()
+        {
+            core.Shot(10);
+            core.Stop(10, 10);
+            Assert.AreEqual(new Point(core.ShotPosition.X + 200, core.ShotPosition.Y), 
+                core.GetModel(10).Location);
+        }
+
+        [Test]
+        public void PickUp_ShouldChangeCoreState_IfCoreIsStopped()
+        {
+            core.Shot(0);
+            core.Stop(0, 0);
+            core.PickUp();
+            Assert.AreEqual(CoreState.InsideSperm, core.State);
+        }
+
+        [Test]
+        public void PickUp_ShouldNotChangeCoreState_IfCoreIsFlying()
+        {
+            core.Shot(0);
+            core.PickUp();
+            Assert.AreEqual(CoreState.Flying, core.State);
         }
     }
 }
