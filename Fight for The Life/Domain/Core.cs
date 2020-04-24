@@ -6,13 +6,13 @@ namespace Fight_for_The_Life.Domain
     {
         public CoreState State { get; private set; } = CoreState.InsideSperm;
         private readonly Sperm sperm;
-        private double ShotVelocity { get; set; }
-        private double SpermVelocityAfterStop { get; set; }
+        private double shotVelocity;
+        private double spermVelocityAfterStop;
         private const double HeightCoefficient = 0.083916;
         private const double WidthCoefficient = 0.03125;
         private static readonly int ModelHeight = (int) (Game.FieldHeight * HeightCoefficient);
         private static readonly int ModelWidth = (int) (Game.FieldWidth * WidthCoefficient);
-        private Point StoppedPosition { get; set; }
+        private Point stoppedPosition;
         public Point ShotPosition { get; private set; }
 
         public Core(Sperm sperm)
@@ -29,10 +29,10 @@ namespace Fight_for_The_Life.Domain
                     (int)(sperm.Location.Y + Game.FieldHeight * 0.00699));
 
             else if (State == CoreState.Stopped)
-                location = new Point((int) (StoppedPosition.X - SpermVelocityAfterStop * timeInSeconds), StoppedPosition.Y);
+                location = new Point((int) (stoppedPosition.X - spermVelocityAfterStop * timeInSeconds), stoppedPosition.Y);
 
             else
-                location = new Point((int)(ShotPosition.X + ShotVelocity * timeInSeconds * 3), ShotPosition.Y);
+                location = new Point((int)(ShotPosition.X + shotVelocity * timeInSeconds * 3), ShotPosition.Y);
 
             return new Rectangle(location.X, location.Y, ModelWidth, ModelHeight);
         }
@@ -41,7 +41,7 @@ namespace Fight_for_The_Life.Domain
         {
             if (State == CoreState.InsideSperm)
             {
-                ShotVelocity = shotVelocity;
+                this.shotVelocity = shotVelocity;
                 ShotPosition = GetModel().Location;
                 State = CoreState.Flying;
             }
@@ -51,8 +51,8 @@ namespace Fight_for_The_Life.Domain
         {
             if (State == CoreState.Flying)
             {
-                StoppedPosition = GetModel(flightTimeInSeconds).Location;
-                SpermVelocityAfterStop = spermVelocity;
+                stoppedPosition = GetModel(flightTimeInSeconds).Location;
+                spermVelocityAfterStop = spermVelocity;
                 State = CoreState.Stopped;
             }
         }
