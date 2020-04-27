@@ -89,7 +89,7 @@ namespace Tests
             core.Shot(10);
             core.Stop(10, 10);
             Assert.AreEqual(new Point(core.ShotPosition.X + 200, core.ShotPosition.Y), 
-                core.GetModel(10).Location);
+                core.GetModel(20).Location);
         }
 
         [Test]

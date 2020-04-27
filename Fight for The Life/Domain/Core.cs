@@ -12,7 +12,7 @@ namespace Fight_for_The_Life.Domain
         private const double WidthCoefficient = 0.03125;
         private static readonly int ModelHeight = (int) (Game.FieldHeight * HeightCoefficient);
         private static readonly int ModelWidth = (int) (Game.FieldWidth * WidthCoefficient);
-        private Point stoppedPosition;
+        private double flightTimeInSeconds;
         public Point ShotPosition { get; private set; }
 
         public Core(Sperm sperm)
@@ -20,7 +20,7 @@ namespace Fight_for_The_Life.Domain
             this.sperm = sperm;
         }
 
-        public Rectangle GetModel(double timeInSeconds = 0)
+        public Rectangle GetModel(double timeAfterShotInSeconds = 0)
         {
             Point location;
 
@@ -29,10 +29,15 @@ namespace Fight_for_The_Life.Domain
                     (int)(sperm.Location.Y + Game.FieldHeight * 0.00699));
 
             else if (State == CoreState.Stopped)
-                location = new Point((int) (stoppedPosition.X - spermVelocityAfterStop * timeInSeconds), stoppedPosition.Y);
+            {
+                var stoppedTime = timeAfterShotInSeconds - flightTimeInSeconds;
+                location = new Point((int)
+                    (ShotPosition.X + shotVelocity * flightTimeInSeconds * 3 - spermVelocityAfterStop * stoppedTime),
+                    ShotPosition.Y);
+            }
 
             else
-                location = new Point((int)(ShotPosition.X + shotVelocity * timeInSeconds * 3), ShotPosition.Y);
+                location = new Point((int)(ShotPosition.X + shotVelocity * timeAfterShotInSeconds * 3), ShotPosition.Y);
 
             return new Rectangle(location.X, location.Y, ModelWidth, ModelHeight);
         }
@@ -51,7 +56,7 @@ namespace Fight_for_The_Life.Domain
         {
             if (State == CoreState.Flying)
             {
-                stoppedPosition = GetModel(flightTimeInSeconds).Location;
+                this.flightTimeInSeconds = flightTimeInSeconds;
                 spermVelocityAfterStop = spermVelocity;
                 State = CoreState.Stopped;
             }
