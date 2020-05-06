@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using Fight_for_The_Life.Views;
 
 namespace Fight_for_The_Life
 {
@@ -10,6 +12,7 @@ namespace Fight_for_The_Life
     {
         static void Main(string[] args)
         {
+            Application.Run(new MainForm());
         }
     }
 }

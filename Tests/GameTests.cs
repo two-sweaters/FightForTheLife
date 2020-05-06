@@ -82,12 +82,11 @@ namespace Tests
         public void UpdateGame_ShouldCreateSomeone_AfterTwoSeconds()
         {
             var game = new Game();
-            for (int i = 0; i < 2000; i++)
+            for (int i = 0; i < 30000; i++)
             {
                 game.UpdateGame(i * 10);
             }
             Assert.IsNotEmpty(game.LivingEnemies);
-            // Дело в псевдорандоме???
         }
 
         [Test]

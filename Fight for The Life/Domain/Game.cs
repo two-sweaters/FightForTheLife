@@ -19,6 +19,7 @@ namespace Fight_for_The_Life.Domain
         public readonly Sperm Sperm = new Sperm();
         public HashSet<Enemy> LivingEnemies { get; private set; } = new HashSet<Enemy>();
         public bool IsGameOver { get; private set; }
+        private readonly Random rand = new Random(12345511);
 
         // пришлось изменить модель подсчета очков,
         // так как в прошлой версии очки зависили от разрешения окна
@@ -49,7 +50,6 @@ namespace Fight_for_The_Life.Domain
         // собираюсь вызывать из формы каждые 10мс => раз в 2с в среднем появляется враг
         public void UpdateGame(double gameTimeInSeconds, double coreFlightTime = 0)
         {
-            var rand = new Random();
             var number = rand.Next(200);
             if (number == 1)
                 GenerateRandomEnemy(gameTimeInSeconds);
@@ -116,9 +116,8 @@ namespace Fight_for_The_Life.Domain
 
         public void GenerateRandomEnemy(double gameTimeInSeconds)
         {
-            var rand = new Random();
             var number = rand.Next(4);
-            var y = rand.Next(FieldHeight - 1);
+            var y = rand.Next((int)(FieldHeight - 1 - FieldHeight * 0.16));
             var velocity = GetVelocityInPixelsPerSecond(gameTimeInSeconds);
 
             if (number == 0)
