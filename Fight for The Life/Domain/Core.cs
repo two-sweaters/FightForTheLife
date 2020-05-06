@@ -42,11 +42,11 @@ namespace Fight_for_The_Life.Domain
             return new Rectangle(location.X, location.Y, ModelWidth, ModelHeight);
         }
 
-        public void Shot(double shotVelocity)
+        public void Shot(double spermVelocity)
         {
             if (State == CoreState.InsideSperm)
             {
-                this.shotVelocity = shotVelocity;
+                this.shotVelocity = spermVelocity * 5;
                 ShotPosition = GetModel().Location;
                 State = CoreState.Flying;
             }

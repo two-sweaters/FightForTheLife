@@ -7,13 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Fight_for_The_Life.Domain.Enemies;
+using Fight_for_The_Life.Views;
 
 namespace Fight_for_The_Life.Domain
 {
     public class Game
     {
-        public static readonly int FieldWidth = 1920;
-        public static readonly int FieldHeight = 715;
+        public static int FieldWidth => Form.ActiveForm.Width;
+        public static int FieldHeight => (int) (Form.ActiveForm.Height * 0.66203703703703703703703703703704);
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private const double AccelerationCoefficient = 1.25;
         public readonly Sperm Sperm = new Sperm();

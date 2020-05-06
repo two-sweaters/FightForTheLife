@@ -95,6 +95,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GameIcon.ico" />
+    <None Include="Resources\Background.jpg" />
+    <None Include="Resources\Control.jpg" />
     <Content Include="Resources\EnemiesSecond.jpg" />
     <None Include="Resources\FirstEnemies.png" />
   </ItemGroup>
