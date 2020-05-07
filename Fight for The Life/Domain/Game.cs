@@ -13,8 +13,26 @@ namespace Fight_for_The_Life.Domain
 {
     public class Game
     {
-        public static int FieldWidth => Form.ActiveForm.Width;
-        public static int FieldHeight => (int) (Form.ActiveForm.Height * 0.66203703703703703703703703703704);
+        public static int FieldWidth
+        {
+            get
+            {
+                if (Form.ActiveForm != null) 
+                    return Form.ActiveForm.Width;
+                return 1920;
+            }
+        }
+
+        public static int FieldHeight
+        {
+            get
+            {
+                if (Form.ActiveForm != null) 
+                    return (int) (Form.ActiveForm.Height * 0.6620370);
+                return 715;
+            }
+        }
+
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private const double AccelerationCoefficient = 1.25;
         public readonly Sperm Sperm = new Sperm();

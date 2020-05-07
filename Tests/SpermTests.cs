@@ -16,10 +16,10 @@ namespace Tests
         public void ShouldNotMovingOutsideTheField()
         {
             var sperm = new Sperm(Game.FieldHeight - Sperm.ModelHeight - 1);
-            sperm.MoveDown();
+            sperm.MoveUp();
             Assert.AreEqual(new Point(0, Game.FieldHeight - Sperm.ModelHeight - 1), sperm.Location);
             sperm = new Sperm(0);
-            sperm.MoveUp();
+            sperm.MoveDown();
             Assert.AreEqual(Point.Empty, sperm.Location);
         }
 

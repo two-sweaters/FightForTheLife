@@ -28,14 +28,14 @@ namespace Fight_for_The_Life.Domain
             Core = new Core(this);
         }
 
-        public void MoveUp()
+        public void MoveDown()
         {
             var location = new Point(Location.X, Location.Y - Game.FieldHeight / 10);
             if (location.Y >= 0) 
                 Location = location;
         }
 
-        public void MoveDown()
+        public void MoveUp()
         {
             var location = new Point(Location.X, Location.Y + Game.FieldHeight / 10);
             if (location.Y < Game.FieldHeight - Model.Height)

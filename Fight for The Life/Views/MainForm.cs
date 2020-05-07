@@ -48,7 +48,7 @@ namespace Fight_for_The_Life.Views
             AddButton("- Выход -", 24, Color.White, 1, 5, 
                 AnchorStyles.None, (sender, args) => Application.Exit());
             AddButton("Играть", 54, Color.Black, 0, 4, 
-                AnchorStyles.Right, (sender, args) => ControlMenu());
+                AnchorStyles.Right, (sender, args) => ControlMenuInitialization());
             AddButton("Противники", 54, Color.Black, 2, 4,
                 AnchorStyles.Left, (sender, args) => EnemiesFirstPageInitialization());
         }
@@ -74,7 +74,7 @@ namespace Fight_for_The_Life.Views
             AddButton("<- Предыдущая страница", 24, Color.White, 0, 5,
                 AnchorStyles.Left, (sender, args) => EnemiesFirstPageInitialization());
         }
-        private void ControlMenu()
+        private void ControlMenuInitialization()
         {
             layoutTable.Controls.Clear();
             BackgroundImage = Properties.Resources.Control;
@@ -87,16 +87,31 @@ namespace Fight_for_The_Life.Views
         {
             layoutTable.Controls.Clear();
             BackgroundImage = Properties.Resources.Background;
+            var scoreLabel = new Label
+            {
+                Anchor = AnchorStyles.Left,
+                AutoSize = true,
+                ForeColor = Color.White,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.None,
+                Font = new Font("Segoe Print", 80, FontStyle.Bold, GraphicsUnit.World)
+            };
+            layoutTable.Controls.Add(scoreLabel);
 
             game = new Game();
             var timer = new Timer();
+            timer.Interval = 1;
             timer.Tick += (sender, args) => gameTimeInMilliseconds++;
             timer.Start();
 
             Paint += (sender, args) =>
             {
-                args.Graphics.FillRectangle(Brushes.PaleGoldenrod, game.Sperm.Model);
-                args.Graphics.FillRectangle(Brushes.PaleGoldenrod, game.Sperm.Core.GetModel());
+                scoreLabel.Text = "Score: " + game.GetScore(gameTimeInMilliseconds / 1000);
+                var indent = (int) (Game.FieldHeight * 0.26993006993);
+                var coreModel = game.Sperm.Core.GetModel();
+                args.Graphics.FillRectangle(Brushes.GhostWhite, new Rectangle(new Point(game.Sperm.Location.X, game.Sperm.Location.Y + indent), game.Sperm.Model.Size));
+                args.Graphics.FillRectangle(Brushes.GhostWhite, new Rectangle(new Point(coreModel.X, coreModel.Y + indent), coreModel.Size));
+                Invalidate();
             };
 
             KeyDown += (sender, args) =>
@@ -118,11 +133,21 @@ namespace Fight_for_The_Life.Views
                     game.Sperm.Core.Shot(game.GetVelocityInPixelsPerSecond(gameTimeInMilliseconds / 1000));
                     Invalidate();
                 }
+
+                if ((args.KeyCode & Keys.Escape) != Keys.Escape)
+                {
+                    PauseGame();
+                }
             };
         }
 
+        private void PauseGame()
+        {
+
+        }
+
         private void AddButton(string text, int size, Color color, 
-            int column, int row, AnchorStyles anchor, EventHandler actionOnClick)
+            int column, int row, AnchorStyles anchor, EventHandler actionOnClick=null)
         {
             var button = new Label();
             button.Anchor = anchor;

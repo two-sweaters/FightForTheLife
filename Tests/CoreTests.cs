@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Fight_for_The_Life.Domain;
+using Fight_for_The_Life.Views;
 
 namespace Tests
 {
@@ -19,7 +20,7 @@ namespace Tests
         public void SetUp()
         {
             sperm = new Sperm();
-            core = new Core(sperm);
+            core = sperm.Core;
         }
 
         [Test]
@@ -31,6 +32,19 @@ namespace Tests
         [Test]
         public void GetModel_ShouldReturnModelInsideSpermModel_AfterCreation()
         {
+            var model = core.GetModel();
+            Assert.True(model.Top > sperm.Model.Top);
+            Assert.True(model.Bottom < sperm.Model.Bottom);
+            Assert.True(model.Left > sperm.Model.Left);
+            Assert.True(model.Right < sperm.Model.Right);
+        }
+
+        [Test]
+        public void GetModel_ShouldReturnModelInsideSpermModel_AfterMoveUp()
+        {
+            sperm.MoveUp();
+            sperm.MoveUp();
+            sperm.MoveUp();
             var model = core.GetModel();
             Assert.True(model.Top > sperm.Model.Top);
             Assert.True(model.Bottom < sperm.Model.Bottom);

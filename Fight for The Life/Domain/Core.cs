@@ -46,7 +46,7 @@ namespace Fight_for_The_Life.Domain
         {
             if (State == CoreState.InsideSperm)
             {
-                this.shotVelocity = spermVelocity * 5;
+                shotVelocity = spermVelocity;
                 ShotPosition = GetModel().Location;
                 State = CoreState.Flying;
             }
