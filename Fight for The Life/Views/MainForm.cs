@@ -4,10 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Fight_for_The_Life.Domain;
+using Fight_for_The_Life;
+using Fight_for_The_Life.Properties;
 
 namespace Fight_for_The_Life.Views
 {
@@ -15,6 +18,7 @@ namespace Fight_for_The_Life.Views
     {
         private readonly TableLayoutPanel layoutTable = new TableLayoutPanel();
         private int gameTimeInMilliseconds;
+        private int timeAfterShotInMilliseconds;
         private Game game;
 
         public MainForm()
@@ -43,7 +47,7 @@ namespace Fight_for_The_Life.Views
         private void MainMenuInitialization()
         {
             layoutTable.Controls.Clear();
-            BackgroundImage = Properties.Resources.MainMenuBackground;
+            BackgroundImage = Resources.MainMenuBackground;
 
             AddButton("- Выход -", 24, Color.White, 1, 5, 
                 AnchorStyles.None, (sender, args) => Application.Exit());
@@ -56,7 +60,7 @@ namespace Fight_for_The_Life.Views
         private void EnemiesFirstPageInitialization()
         {
             layoutTable.Controls.Clear();
-            BackgroundImage = Properties.Resources.FirstEnemies;
+            BackgroundImage = Resources.FirstEnemies;
 
             AddButton("- Выход -", 24, Color.White, 0, 5,
                 AnchorStyles.Left, (sender, args) => MainMenuInitialization());
@@ -67,7 +71,7 @@ namespace Fight_for_The_Life.Views
         private void EnemiesSecondPageInitialization()
         {
             layoutTable.Controls.Clear();
-            BackgroundImage = Properties.Resources.EnemiesSecond;
+            BackgroundImage = Resources.EnemiesSecond;
 
             AddButton("- Выход -", 24, Color.White, 2, 5,
                 AnchorStyles.Right, (sender, args) => MainMenuInitialization());
@@ -86,60 +90,59 @@ namespace Fight_for_The_Life.Views
         private void StartGame()
         {
             layoutTable.Controls.Clear();
-            BackgroundImage = Properties.Resources.Background;
-            var scoreLabel = new Label
-            {
-                Anchor = AnchorStyles.Left,
-                AutoSize = true,
-                ForeColor = Color.White,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.None,
-                Font = new Font("Segoe Print", 80, FontStyle.Bold, GraphicsUnit.World)
-            };
-            layoutTable.Controls.Add(scoreLabel);
+            BackgroundImage = null;
+            var font = new Font("Segoe Print", 80, FontStyle.Bold, GraphicsUnit.World);
 
             game = new Game();
-            var timer = new Timer();
-            timer.Interval = 1;
-            timer.Tick += (sender, args) => gameTimeInMilliseconds++;
-            timer.Start();
-
-            Paint += (sender, args) =>
+            var timer = new Timer {Interval = 50};
+            timer.Tick += (sender, args) =>
             {
-                scoreLabel.Text = "Score: " + game.GetScore(gameTimeInMilliseconds / 1000);
-                var indent = (int) (Game.FieldHeight * 0.26993006993);
-                var coreModel = game.Sperm.Core.GetModel();
-                args.Graphics.FillRectangle(Brushes.GhostWhite, new Rectangle(new Point(game.Sperm.Location.X, game.Sperm.Location.Y + indent), game.Sperm.Model.Size));
-                args.Graphics.FillRectangle(Brushes.GhostWhite, new Rectangle(new Point(coreModel.X, coreModel.Y + indent), coreModel.Size));
+                gameTimeInMilliseconds += 50;
                 Invalidate();
             };
-
+            timer.Start();
+            var image = new Bitmap(Resources.Background, Width, Height);
+            var spermImage = new Bitmap(Resources.MainSperm, Resources.MainSperm.Width * Width / 1920, 
+                Resources.MainSperm.Height * Height / 1080);
+            var coreImage = new Bitmap(Resources.Core, Resources.Core.Width * Width / 1920, Resources.Core.Height * Height / 1080);
+            Paint += (sender, args) =>
+            {
+                var text = "Score: " + game.GetScore(gameTimeInMilliseconds / 1000d);
+                var indent = (int) (Game.FieldHeight * 0.26993006993);
+                var coreModel = game.Sperm.Core.GetModel(timeAfterShotInMilliseconds / 1000d);
+                args.Graphics.DrawImage(image, 0, 0);
+                args.Graphics.DrawString(text, font, new SolidBrush(Color.White), new PointF(0, 0));
+                args.Graphics.DrawImage(spermImage, new Point(game.Sperm.Model.Width - spermImage.Width, 
+                    game.Sperm.Location.Y - (spermImage.Height - game.Sperm.Model.Height) / 2 + indent));
+                args.Graphics.DrawImage(coreImage, new Point(coreModel.X + coreModel.Width - coreImage.Width,
+                    coreModel.Location.Y - (coreImage.Height - coreModel.Height) / 2 + indent));
+            };
             KeyDown += (sender, args) =>
             {
-                if ((args.KeyCode & Keys.Up) != Keys.Up)
+                if (args.KeyCode == Keys.Up)
                 {
                     game.Sperm.MoveUp();
-                    Invalidate();
                 }
 
-                if (((args.KeyCode & Keys.Down) != Keys.Down))
+                if (args.KeyCode == Keys.Down)
                 {
                     game.Sperm.MoveDown();
-                    Invalidate();
                 }
 
-                if ((args.KeyData & Keys.Space) != 0)
+                if (args.KeyCode == Keys.Space)
                 {
-                    game.Sperm.Core.Shot(game.GetVelocityInPixelsPerSecond(gameTimeInMilliseconds / 1000));
-                    Invalidate();
+                    game.Sperm.Core.Shot(game.GetVelocityInPixelsPerSecond(gameTimeInMilliseconds / 1000d));
+                    timer.Tick += (o, eventArgs) => timeAfterShotInMilliseconds += 50;
                 }
 
-                if ((args.KeyCode & Keys.Escape) != Keys.Escape)
+                if (args.KeyCode == Keys.Escape)
                 {
                     PauseGame();
                 }
             };
         }
+    
+
 
         private void PauseGame()
         {
@@ -149,15 +152,17 @@ namespace Fight_for_The_Life.Views
         private void AddButton(string text, int size, Color color, 
             int column, int row, AnchorStyles anchor, EventHandler actionOnClick=null)
         {
-            var button = new Label();
-            button.Anchor = anchor;
-            button.Text = text;
-            button.AutoSize = true;
-            button.Cursor = Cursors.Hand;
-            button.ForeColor = color;
-            button.TextAlign = ContentAlignment.MiddleCenter;
-            button.Dock = DockStyle.None;
-            button.Font = new Font("Segoe Print", size, FontStyle.Bold, GraphicsUnit.World);
+            var button = new Label
+            {
+                Anchor = anchor,
+                Text = text,
+                AutoSize = true,
+                Cursor = Cursors.Hand,
+                ForeColor = color,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.None,
+                Font = new Font("Segoe Print", size, FontStyle.Bold, GraphicsUnit.World)
+            };
             button.Click += actionOnClick;
             layoutTable.Controls.Add(button, column, row);
         }
