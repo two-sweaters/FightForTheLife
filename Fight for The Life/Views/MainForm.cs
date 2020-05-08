@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Fight_for_The_Life.Domain;
 
@@ -86,32 +81,28 @@ namespace Fight_for_The_Life.Views
         private void StartGame()
         {
             layoutTable.Controls.Clear();
-            BackgroundImage = Properties.Resources.Background;
-            var scoreLabel = new Label
-            {
-                Anchor = AnchorStyles.Left,
-                AutoSize = true,
-                ForeColor = Color.White,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.None,
-                Font = new Font("Segoe Print", 80, FontStyle.Bold, GraphicsUnit.World)
-            };
-            layoutTable.Controls.Add(scoreLabel);
+            BackgroundImage = null;
+            var font = new Font("Segoe Print", 80, FontStyle.Bold, GraphicsUnit.World);
 
             game = new Game();
             var timer = new Timer();
-            timer.Interval = 1;
-            timer.Tick += (sender, args) => gameTimeInMilliseconds++;
+            timer.Interval = 100;
+            timer.Tick += (sender, args) =>
+            {
+                gameTimeInMilliseconds += 100;
+                Invalidate();
+            };
             timer.Start();
-
+            var image = new Bitmap(Properties.Resources.Background, Width, Height);
             Paint += (sender, args) =>
             {
-                scoreLabel.Text = "Score: " + game.GetScore(gameTimeInMilliseconds / 1000);
+                var text = "Score: " + game.GetScore(gameTimeInMilliseconds / 1000d);
                 var indent = (int) (Game.FieldHeight * 0.26993006993);
                 var coreModel = game.Sperm.Core.GetModel();
+                args.Graphics.DrawImage(image, 0, 0);
+                args.Graphics.DrawString(text, font, new SolidBrush(Color.White), new PointF(0, 0));
                 args.Graphics.FillRectangle(Brushes.GhostWhite, new Rectangle(new Point(game.Sperm.Location.X, game.Sperm.Location.Y + indent), game.Sperm.Model.Size));
                 args.Graphics.FillRectangle(Brushes.GhostWhite, new Rectangle(new Point(coreModel.X, coreModel.Y + indent), coreModel.Size));
-                Invalidate();
             };
 
             KeyDown += (sender, args) =>
