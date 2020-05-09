@@ -108,11 +108,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GameIcon.ico" />
+    <None Include="Resources\Spiral.png" />
+    <None Include="Resources\Sperm.png" />
+    <None Include="Resources\Pill.png" />
+    <None Include="Resources\GameIcon.ico" />
     <None Include="Resources\MainSperm.png" />
     <None Include="Resources\Background.jpg" />
     <None Include="Resources\Control.jpg" />
-    <None Include="Resources\Core.bmp" />
     <None Include="Resources\Core.png" />
+    <None Include="Resources\Blood.png" />
     <Content Include="Resources\EnemiesSecond.jpg" />
     <None Include="Resources\FirstEnemies.png" />
   </ItemGroup>

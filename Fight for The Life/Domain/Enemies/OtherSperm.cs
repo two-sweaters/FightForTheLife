@@ -13,12 +13,12 @@ namespace Fight_for_The_Life.Domain.Enemies
             if (y > Game.FieldHeight - 1 - Game.FieldHeight * HeightCoefficient || y < 0)
                 throw new ArgumentException("Y was outside the game field!");
             Y = y;
-            Velocity = spermVelocity * 2;
+            Velocity = spermVelocity;
         }
 
-        public override Point GetLocation(double timeAliveInSeconds)
+        public override Point GetLocation()
         {
-            return new Point((int)(Velocity * timeAliveInSeconds), Y);
+            return new Point((int)(Velocity * TimeAliveInSeconds - Game.FieldWidth * WidthCoefficient), Y);
         }
     }
 }

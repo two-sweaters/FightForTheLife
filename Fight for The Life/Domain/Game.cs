@@ -33,17 +33,18 @@ namespace Fight_for_The_Life.Domain
             }
         }
 
+        private double gameTimeInSeconds;
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private const double AccelerationCoefficient = 1.25;
         public readonly Sperm Sperm = new Sperm();
         public HashSet<Enemy> LivingEnemies { get; private set; } = new HashSet<Enemy>();
         public bool IsGameOver { get; private set; }
-        private readonly Random rand = new Random(12345511);
+        private readonly Random rand = new Random();
 
         // пришлось изменить модель подсчета очков,
         // так как в прошлой версии очки зависили от разрешения окна
         // теперь очки = кол-во пройденых окон * 1000
-        public int GetScore(double gameTimeInSeconds)
+        public int GetScore()
         {
             var segmentsAmount = (int)(gameTimeInSeconds / 15);
             var lastSegmentTime = gameTimeInSeconds % 60;
@@ -61,44 +62,59 @@ namespace Fight_for_The_Life.Domain
             return (int)(screensAmount * 1000);
         }
 
-        public double GetVelocityInPixelsPerSecond(double gameTimeInSeconds)
+        public void IncreaseGameTimeInSeconds(double seconds)
+        {
+            gameTimeInSeconds += seconds;
+            foreach (var enemy in LivingEnemies)
+            {
+                enemy.TimeAliveInSeconds += seconds;
+            }
+
+            if (Sperm.Core.State != CoreState.InsideSperm)
+                Sperm.Core.timeAfterShotInSeconds += seconds;
+
+            if (Sperm.Core.State == CoreState.Flying)
+                Sperm.Core.flightTimeInSeconds += seconds;
+        }
+
+        public double GetVelocityInPixelsPerSecond()
         {
             return Math.Pow(AccelerationCoefficient, (int)(gameTimeInSeconds / 15)) * StartVelocity;
         }
 
-        // собираюсь вызывать из формы каждые 10мс => раз в 2с в среднем появляется враг
-        public void UpdateGame(double gameTimeInSeconds, double coreFlightTime = 0)
+        // собираюсь вызывать из формы каждые 50мс => раз в 2с в среднем появляется враг
+        public void UpdateGame(double coreFlightTime = 0)
         {
-            var number = rand.Next(200);
+            var number = rand.Next(40);
             if (number == 1)
-                GenerateRandomEnemy(gameTimeInSeconds);
+                GenerateRandomEnemy();
 
-            CheckAndUpdateCore(coreFlightTime);
+            CheckAndUpdateCore();
             if (IsGameOver)
                 return;
 
-            CheckAndUpdateLivingEnemies(gameTimeInSeconds, coreFlightTime);
+            CheckAndUpdateLivingEnemies();
         }
 
-        private void CheckAndUpdateLivingEnemies(double gameTimeInSeconds, double coreFlightTime)
+        private void CheckAndUpdateLivingEnemies()
         {
-            var coreModel = Sperm.Core.GetModel(coreFlightTime);
+            var coreModel = Sperm.Core.GetModel();
             var newLivingEnemies = new HashSet<Enemy>(LivingEnemies);
             foreach (var enemy in LivingEnemies)
             {
-                var enemyModel = enemy.GetModel(gameTimeInSeconds);
+                var enemyModel = enemy.GetModel();
                 if (enemy is OtherSperm)
                 {
-                    if (enemyModel.X < 0 || enemyModel.X > FieldWidth)
+                    if (enemyModel.X > FieldWidth)
                     {
                         IsGameOver = true;
                         return;
                     }
 
-                    if (coreModel.IntersectsWith(enemyModel))
+                    if (coreModel.IntersectsWith(enemyModel) && Sperm.Core.State != CoreState.InsideSperm)
                     {
                         newLivingEnemies.Remove(enemy);
-                        Sperm.Core.Stop(coreFlightTime, GetVelocityInPixelsPerSecond(gameTimeInSeconds));
+                        Sperm.Core.Stop(GetVelocityInPixelsPerSecond());
                     }
                 }
 
@@ -110,7 +126,7 @@ namespace Fight_for_The_Life.Domain
                         return;
                     }
 
-                    if (enemyModel.X < 0 || enemyModel.X > FieldWidth)
+                    if (enemyModel.X < -enemyModel.Width || enemyModel.X > FieldWidth)
                         newLivingEnemies.Remove(enemy);
                 }
             }
@@ -118,9 +134,9 @@ namespace Fight_for_The_Life.Domain
             LivingEnemies = newLivingEnemies;
         }
 
-        private void CheckAndUpdateCore(double coreFlightTime)
+        private void CheckAndUpdateCore()
         {
-            var coreModel = Sperm.Core.GetModel(coreFlightTime);
+            var coreModel = Sperm.Core.GetModel();
             if (Sperm.Core.State != CoreState.InsideSperm)
             {
                 if (coreModel.X < 0 || coreModel.X > FieldWidth)
@@ -133,11 +149,11 @@ namespace Fight_for_The_Life.Domain
             }
         }
 
-        public void GenerateRandomEnemy(double gameTimeInSeconds)
+        public void GenerateRandomEnemy()
         {
             var number = rand.Next(4);
             var y = rand.Next((int)(FieldHeight - 1 - FieldHeight * 0.16));
-            var velocity = GetVelocityInPixelsPerSecond(gameTimeInSeconds);
+            var velocity = GetVelocityInPixelsPerSecond();
 
             if (number == 0)
                 LivingEnemies.Add(new BirthControl(y, velocity));
@@ -145,11 +161,12 @@ namespace Fight_for_The_Life.Domain
             else if (number == 1)
                 LivingEnemies.Add(new Blood(y, velocity));
 
-            else if (number == 2) 
-                LivingEnemies.Add(new IntrauterineDevice(velocity));
-
-            else
+            else if (LivingEnemies.All(e => !(e is OtherSperm) || e.GetLocation().X > Game.FieldWidth / 2) 
+                     && number == 2)
                 LivingEnemies.Add(new OtherSperm(y, velocity));
+
+            else if (LivingEnemies.All(e => !(e is IntrauterineDevice)))
+                LivingEnemies.Add(new IntrauterineDevice(velocity));
         }
     }
 }

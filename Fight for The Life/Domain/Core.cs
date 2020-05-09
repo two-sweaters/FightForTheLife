@@ -12,7 +12,8 @@ namespace Fight_for_The_Life.Domain
         private const double WidthCoefficient = 0.03125;
         private static readonly int ModelHeight = (int) (Game.FieldHeight * HeightCoefficient);
         private static readonly int ModelWidth = (int) (Game.FieldWidth * WidthCoefficient);
-        private double flightTimeInSeconds;
+        public double flightTimeInSeconds { get; set; }
+        public double timeAfterShotInSeconds { get; set; }
         public Point ShotPosition { get; private set; }
 
         public Core(Sperm sperm)
@@ -20,7 +21,7 @@ namespace Fight_for_The_Life.Domain
             this.sperm = sperm;
         }
 
-        public Rectangle GetModel(double timeAfterShotInSeconds = 0)
+        public Rectangle GetModel()
         {
             Point location;
 
@@ -52,11 +53,10 @@ namespace Fight_for_The_Life.Domain
             }
         }
 
-        public void Stop(double flightTimeInSeconds, double spermVelocity)
+        public void Stop(double spermVelocity)
         {
             if (State == CoreState.Flying)
             {
-                this.flightTimeInSeconds = flightTimeInSeconds;
                 spermVelocityAfterStop = spermVelocity;
                 State = CoreState.Stopped;
             }
@@ -65,7 +65,11 @@ namespace Fight_for_The_Life.Domain
         public void PickUp()
         {
             if (State == CoreState.Stopped)
+            {
+                timeAfterShotInSeconds = 0;
+                flightTimeInSeconds = 0;
                 State = CoreState.InsideSperm;
+            }
         }
     }
 

@@ -83,6 +83,16 @@ namespace Fight_for_The_Life.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Blood {
+            get {
+                object obj = ResourceManager.GetObject("Blood", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Control {
             get {
                 object obj = ResourceManager.GetObject("Control", resourceCulture);
@@ -121,6 +131,16 @@ namespace Fight_for_The_Life.Properties {
         }
         
         /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
+        /// </summary>
+        public static System.Drawing.Icon GameIcon {
+            get {
+                object obj = ResourceManager.GetObject("GameIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Fight for The Life: Natural Selection.
         /// </summary>
         public static string MainForm_MainForm_Fight_for_The_Life__Natural_Selection {
@@ -145,6 +165,36 @@ namespace Fight_for_The_Life.Properties {
         public static System.Drawing.Bitmap MainSperm {
             get {
                 object obj = ResourceManager.GetObject("MainSperm", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Pill {
+            get {
+                object obj = ResourceManager.GetObject("Pill", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Sperm {
+            get {
+                object obj = ResourceManager.GetObject("Sperm", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Spiral {
+            get {
+                object obj = ResourceManager.GetObject("Spiral", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

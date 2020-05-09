@@ -16,8 +16,8 @@ namespace Tests
         [Test]
         public void ShouldNotMoving_WhenCreatingWithZeroVelocity()
         {
-            var blood = new Blood(0, 0);
-            Assert.AreEqual(new Point(Game.FieldWidth - 1, 0), blood.GetLocation(1));
+            var blood = new Blood(0, 0) {TimeAliveInSeconds = 1};
+            Assert.AreEqual(new Point(Game.FieldWidth - 1, 0), blood.GetLocation());
         }
 
         [Test]
@@ -29,15 +29,15 @@ namespace Tests
         [Test]
         public void ShouldCalculateRightLocation()
         {
-            var blood = new Blood(0, 10);
-            Assert.AreEqual(new Point(Game.FieldWidth - 25, 0), blood.GetLocation(2));
+            var blood = new Blood(0, 10) {TimeAliveInSeconds = 2};
+            Assert.AreEqual(new Point(Game.FieldWidth - 25, 0), blood.GetLocation());
         }
 
         [Test]
         public void ShouldCreatingWithRightSize()
         {
             var blood= new Blood(0, 1);
-            var model = blood.GetModel(0);
+            var model = blood.GetModel();
             Assert.AreEqual(75, model.Height);
             Assert.AreEqual(120, model.Width);
         }

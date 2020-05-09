@@ -17,28 +17,28 @@ namespace Tests
         public void ShouldCalculateRightVelocity_AfterCreation()
         {
             var game = new Game();
-            Assert.AreEqual(480, game.GetVelocityInPixelsPerSecond(0));
+            Assert.AreEqual(480, game.GetVelocityInPixelsPerSecond());
         }
 
         [Test]
         public void ShouldCalculateRightVelocity_15SecondsAfterCreation()
         {
             var game = new Game();
-            Assert.AreEqual(600, game.GetVelocityInPixelsPerSecond(15));
+            Assert.AreEqual(600, game.GetVelocityInPixelsPerSecond());
         }
 
         [Test]
         public void ShouldCalculateRightScore()
         {
             var game = new Game();
-            Assert.AreEqual(1250, game.GetScore(5));
+            Assert.AreEqual(1250, game.GetScore());
         }
 
         [Test]
         public void GenerateRandomEnemy_ShouldCreateAnyEnemy()
         {
             var game = new Game();
-            game.GenerateRandomEnemy(0);
+            game.GenerateRandomEnemy();
             Assert.IsNotEmpty(game.LivingEnemies);
         }
 
@@ -47,7 +47,7 @@ namespace Tests
         {
             var game = new Game();
             game.Sperm.Core.Shot(2000);
-            game.UpdateGame(1, 1);
+            game.UpdateGame();
             Assert.IsTrue(game.IsGameOver);
         }
 
@@ -82,7 +82,7 @@ namespace Tests
         public void UpdateGame_ShouldCreateSomeone_AfterTwoSeconds()
         {
             var game = new Game();
-            for (int i = 0; i < 30000; i++)
+            for (int i = 0; i < 80; i++)
             {
                 game.UpdateGame(i * 10);
             }

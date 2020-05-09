@@ -56,7 +56,7 @@ namespace Fight_for_The_Life.Views
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(282, 253);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(968, 491);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // ExitButton
@@ -66,9 +66,9 @@ namespace Fight_for_The_Life.Views
             this.ExitButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.ExitButton.Font = new System.Drawing.Font("Segoe Print", 19.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.ExitButton.ForeColor = System.Drawing.Color.White;
-            this.ExitButton.Location = new System.Drawing.Point(101, 210);
+            this.ExitButton.Location = new System.Drawing.Point(385, 419);
             this.ExitButton.Name = "ExitButton";
-            this.ExitButton.Size = new System.Drawing.Size(79, 43);
+            this.ExitButton.Size = new System.Drawing.Size(196, 58);
             this.ExitButton.TabIndex = 0;
             this.ExitButton.Text = "- Выход -";
             this.ExitButton.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -77,7 +77,7 @@ namespace Fight_for_The_Life.Views
             // 
             this.BackgroundImage = global::Fight_for_The_Life.Properties.Resources.EnemiesSecond;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(282, 253);
+            this.ClientSize = new System.Drawing.Size(968, 491);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
