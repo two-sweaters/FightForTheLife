@@ -136,10 +136,10 @@ namespace Fight_for_The_Life.Views
                 var coreModel = game.Sperm.Core.GetModel();
                 args.Graphics.DrawImage(image, 0, 0);
                 args.Graphics.DrawString(text, font, new SolidBrush(Color.White), new PointF(0, 0));
-                args.Graphics.DrawImage(spermImage, new Point(game.Sperm.Model.Width - spermImage.Width,
-                    game.Sperm.Location.Y - (spermImage.Height - game.Sperm.Model.Height) / 2 + indent));
                 args.Graphics.DrawImage(coreImage, new Point(coreModel.X + coreModel.Width - coreImage.Width,
                     coreModel.Location.Y - (coreImage.Height - coreModel.Height) / 2 + indent));
+                args.Graphics.DrawImage(spermImage, new Point(game.Sperm.Model.Width - spermImage.Width,
+                    game.Sperm.Location.Y - (spermImage.Height - game.Sperm.Model.Height) / 2 + indent));
                 DrawEnemies(args, bloodImage, intrauterineDeviceImage, pillImage, otherSpermImage, indent);
             };
             Paint += gameDrawing;
@@ -161,17 +161,17 @@ namespace Fight_for_The_Life.Views
 
                 if (enemy is IntrauterineDevice)
                     args.Graphics.DrawImage(intrauterineDeviceImage, new Point(
-                        enemyModel.X + enemyModel.Width - intrauterineDeviceImage.Width,
+                        enemyModel.X,
                         enemyModel.Location.Y - (intrauterineDeviceImage.Height - enemyModel.Height) / 2 + indent));
 
                 if (enemy is BirthControl)
                     args.Graphics.DrawImage(pillImage, new Point(
-                        enemyModel.X + enemyModel.Width - pillImage.Width,
+                        enemyModel.X,
                         enemyModel.Location.Y - (pillImage.Height - enemyModel.Height) / 2 + indent));
 
                 if (enemy is OtherSperm)
                     args.Graphics.DrawImage(otherSpermImage, new Point(
-                        enemyModel.X + enemyModel.Width - otherSpermImage.Width,
+                        enemyModel.X,
                         enemyModel.Location.Y - (otherSpermImage.Height - enemyModel.Height) / 2 + indent));
             }
         }

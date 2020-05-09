@@ -34,6 +34,7 @@ namespace Fight_for_The_Life.Domain
         }
 
         private double gameTimeInSeconds;
+        private double emptyFieldTime;
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private const double AccelerationCoefficient = 1.25;
         public readonly Sperm Sperm = new Sperm();
@@ -75,6 +76,9 @@ namespace Fight_for_The_Life.Domain
 
             if (Sperm.Core.State == CoreState.Flying)
                 Sperm.Core.flightTimeInSeconds += seconds;
+
+            if (LivingEnemies.Count == 0)
+                emptyFieldTime += seconds;
         }
 
         public double GetVelocityInPixelsPerSecond()
@@ -86,7 +90,7 @@ namespace Fight_for_The_Life.Domain
         public void UpdateGame(double coreFlightTime = 0)
         {
             var number = rand.Next(40);
-            if (number == 1)
+            if (number == 1 || emptyFieldTime > 3)
                 GenerateRandomEnemy();
 
             CheckAndUpdateCore();
@@ -111,7 +115,7 @@ namespace Fight_for_The_Life.Domain
                         return;
                     }
 
-                    if (coreModel.IntersectsWith(enemyModel) && Sperm.Core.State != CoreState.InsideSperm)
+                    if (coreModel.IntersectsWith(enemyModel) && Sperm.Core.State != CoreState.InsideSperm || core)
                     {
                         newLivingEnemies.Remove(enemy);
                         Sperm.Core.Stop(GetVelocityInPixelsPerSecond());
@@ -154,19 +158,21 @@ namespace Fight_for_The_Life.Domain
             var number = rand.Next(4);
             var y = rand.Next((int)(FieldHeight - 1 - FieldHeight * 0.16));
             var velocity = GetVelocityInPixelsPerSecond();
+            if (LivingEnemies.Count < 3)
+            {
+                if (number == 0)
+                    LivingEnemies.Add(new BirthControl(y, velocity));
 
-            if (number == 0)
-                LivingEnemies.Add(new BirthControl(y, velocity));
+                else if (number == 1)
+                    LivingEnemies.Add(new Blood(y, velocity));
 
-            else if (number == 1)
-                LivingEnemies.Add(new Blood(y, velocity));
+                else if (LivingEnemies.All(e => !(e is OtherSperm) || e.GetLocation().X > Game.FieldWidth / 2)
+                         && number == 2)
+                    LivingEnemies.Add(new OtherSperm(y, velocity));
 
-            else if (LivingEnemies.All(e => !(e is OtherSperm) || e.GetLocation().X > Game.FieldWidth / 2) 
-                     && number == 2)
-                LivingEnemies.Add(new OtherSperm(y, velocity));
-
-            else if (LivingEnemies.All(e => !(e is IntrauterineDevice)))
-                LivingEnemies.Add(new IntrauterineDevice(velocity));
+                else if (LivingEnemies.All(e => !(e is IntrauterineDevice)))
+                    LivingEnemies.Add(new IntrauterineDevice(velocity));
+            }
         }
     }
 }
