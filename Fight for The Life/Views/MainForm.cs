@@ -22,9 +22,9 @@ namespace Fight_for_The_Life.Views
         private Game game;
         private KeyEventHandler onKeyDown;
         private PaintEventHandler gameDrawing;
-
         public MainForm()
         {
+            Size = new Size(1920, 1080);
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.None;
             Icon = Resources.GameIcon;
@@ -53,7 +53,7 @@ namespace Fight_for_The_Life.Views
             MainMenuInitialization();
         }
 
-        private void MainMenuInitialization()
+        private void MainMenuInitialization(int textSizeS = 24, int textSizeL = 54)
         {
             Paint -= gameDrawing;
             layoutTable.Controls.Clear();
@@ -66,6 +66,7 @@ namespace Fight_for_The_Life.Views
                 AnchorStyles.Right, (sender, args) => ControlMenuInitialization());
             AddButton("Противники", 54, Color.Black, 2, 4,
                 AnchorStyles.Left, (sender, args) => EnemiesFirstPageInitialization());
+            Invalidate();
         }
 
         private void EnemiesFirstPageInitialization()
@@ -269,7 +270,7 @@ namespace Fight_for_The_Life.Views
                 ForeColor = color,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.None,
-                Font = new Font("Segoe Print", size, FontStyle.Bold, GraphicsUnit.World)
+                Font = new Font("Segoe Print",(int) (size * Width / 1920d), FontStyle.Bold, GraphicsUnit.World)
             };
             button.Click += actionOnClick;
             layoutTable.Controls.Add(button, column, row);

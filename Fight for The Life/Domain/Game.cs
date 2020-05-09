@@ -115,7 +115,7 @@ namespace Fight_for_The_Life.Domain
                         return;
                     }
 
-                    if (coreModel.IntersectsWith(enemyModel) && Sperm.Core.State != CoreState.InsideSperm || core)
+                    if (coreModel.IntersectsWith(enemyModel) && Sperm.Core.State != CoreState.InsideSperm)
                     {
                         newLivingEnemies.Remove(enemy);
                         Sperm.Core.Stop(GetVelocityInPixelsPerSecond());
