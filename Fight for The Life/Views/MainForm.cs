@@ -192,14 +192,14 @@ namespace Fight_for_The_Life.Views
                 });
 
             AddButton("Enter - новая игра", 24, Color.White, 2, 5, 
-                AnchorStyles.None, (sender, args) =>
+                AnchorStyles.Right, (sender, args) =>
                 {
                     KeyDown -= onKeyDown;
                     Paint -= gameDrawing;
                     StartGame();
                 });
 
-            AddButton("Game Over", 80, Color.White, 1, 1, AnchorStyles.None);
+            AddButton("Game Over", 75, Color.White, 1, 1, AnchorStyles.None);
 
             onKeyDown = (sender, args) =>
             {
