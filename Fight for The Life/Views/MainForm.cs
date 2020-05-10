@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Text;
@@ -21,6 +22,7 @@ namespace Fight_for_The_Life.Views
         private readonly Timer timer = new Timer(){ Interval = 50 };
         private Game game;
         private KeyEventHandler onKeyDown;
+        private int highestScore;
         private PaintEventHandler gameDrawing;
         public MainForm()
         {
@@ -47,10 +49,34 @@ namespace Fight_for_The_Life.Views
                 game.UpdateGame();
                 if (game.IsGameOver)
                     GameOver();
+                var score = game.GetScore();
+                if (score > highestScore)
+                    highestScore = score;
                 Invalidate();
             };
 
+            CheckSave();
             MainMenuInitialization();
+        }
+
+        private void CheckSave()
+        {
+            var saveData = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
+            var saveInfo = string.Join("", new string(Encoding.Unicode.GetChars(saveData)));
+
+            if (saveInfo.Split().Length == 2)
+            {
+                highestScore = int.Parse(saveInfo.Split()[1]);
+            }
+            else
+                highestScore = 0;
+        }
+
+        private bool IsThereSaveFile()
+        {
+            return Directory
+                .GetFiles(".")
+                .Any(f => f.Equals(Path.Combine(Directory.GetCurrentDirectory(), "save.dat")));
         }
 
         private void MainMenuInitialization(int textSizeS = 24, int textSizeL = 54)
@@ -104,7 +130,8 @@ namespace Fight_for_The_Life.Views
             layoutTable.Controls.Clear();
             layoutTable.BackColor = Color.Transparent;
             BackgroundImage = null;
-            var font = new Font("Segoe Print", 80, FontStyle.Bold, GraphicsUnit.World);
+            var font = new Font("Segoe Print", (int) (70 * Width / 1920d), 
+                FontStyle.Bold, GraphicsUnit.World);
 
             game = new Game();
             timer.Start();
@@ -132,11 +159,13 @@ namespace Fight_for_The_Life.Views
 
             gameDrawing = (sender, args) =>
             {
-                var text = "Score: " + game.GetScore();
+                var scoreText = "Score: " + game.GetScore();
+                var highestText = "Highest Score: " + highestScore;
                 var indent = (int) (Game.FieldHeight * 0.26993006993);
                 var coreModel = game.Sperm.Core.GetModel();
                 args.Graphics.DrawImage(image, 0, 0);
-                args.Graphics.DrawString(text, font, new SolidBrush(Color.White), new PointF(0, 0));
+                args.Graphics.DrawString(scoreText, font, new SolidBrush(Color.White), new PointF(0, 0));
+                args.Graphics.DrawString(highestText, font, Brushes.White, new PointF(1050 * Width / 1920f, 0));
                 args.Graphics.DrawImage(coreImage, new Point(coreModel.X + coreModel.Width - coreImage.Width,
                     coreModel.Location.Y - (coreImage.Height - coreModel.Height) / 2 + indent));
                 args.Graphics.DrawImage(spermImage, new Point(game.Sperm.Model.Width - spermImage.Width,
@@ -182,6 +211,12 @@ namespace Fight_for_The_Life.Views
             timer.Stop();
             KeyDown -= onKeyDown;
             layoutTable.BackColor = Color.FromArgb(128, 0, 0, 0);
+            //if (IsThereSaveFile())
+            //    File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
+
+            File.WriteAllBytes(
+                Path.Combine(Directory.GetCurrentDirectory(), "save.dat"), 
+                Encoding.Unicode.GetBytes("HighestScore " + highestScore));
 
             AddButton("Esc - выход в меню", 24, Color.White, 0, 5, 
                 AnchorStyles.Left, (sender, args) =>
