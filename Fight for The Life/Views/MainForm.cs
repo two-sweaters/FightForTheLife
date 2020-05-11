@@ -83,7 +83,7 @@ namespace Fight_for_The_Life.Views
             gameDrawing = (sender, args) =>
             {
                 args.Graphics.DrawImage(images.Dna, new Point(20, 20));
-                args.Graphics.DrawString(game.DnaAmount.ToString(), font, Brushes.White, 40 + dnaImage.Width, 10);
+                args.Graphics.DrawString(game.DnaAmount.ToString(), font, Brushes.White, 40 +images.Dna.Width, 10);
             };
             Paint += gameDrawing;
             layoutTable.Controls.Clear();
