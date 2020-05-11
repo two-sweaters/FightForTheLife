@@ -17,7 +17,6 @@ using Fight_for_The_Life.Properties;
 
 namespace Fight_for_The_Life.Views
 {
-    //TODO отрефакторить
     public partial class MainForm : Form
     {
         private readonly TableLayoutPanel layoutTable = new TableLayoutPanel();
@@ -25,6 +24,7 @@ namespace Fight_for_The_Life.Views
         private Game game;
         private KeyEventHandler onKeyDown;
         private PaintEventHandler gameDrawing;
+        private GameImages images;
         public MainForm()
         {
             Size = new Size(1920, 1080);
@@ -76,14 +76,13 @@ namespace Fight_for_The_Life.Views
 
         private void MainMenuInitialization()
         {
-            var dnaImage = new Bitmap(Resources.Dna, Resources.Dna.Width * Width / 1920, 
-                Resources.Dna.Height * Height / 1080);
+            images = new GameImages(Width, Height);
             var font = new Font("Segoe Print", (int)(70 * Width / 1920d),
                 FontStyle.Bold, GraphicsUnit.World);
             Paint -= gameDrawing;
             gameDrawing = (sender, args) =>
             {
-                args.Graphics.DrawImage(dnaImage, new Point(20, 20));
+                args.Graphics.DrawImage(images.Dna, new Point(20, 20));
                 args.Graphics.DrawString(game.DnaAmount.ToString(), font, Brushes.White, 40 + dnaImage.Width, 10);
             };
             Paint += gameDrawing;
@@ -142,29 +141,7 @@ namespace Fight_for_The_Life.Views
             CheckSave();
             timer.Start();
 
-            var image = new Bitmap(Resources.Background, Width, Height);
 
-            var spermImage = new Bitmap(Resources.MainSperm, Resources.MainSperm.Width * Width / 1920, 
-                Resources.MainSperm.Height * Height / 1080);
-
-            var coreImage = new Bitmap(Resources.Core, Resources.Core.Width * Width / 1920, 
-                Resources.Core.Height * Height / 1080);
-
-            var bloodImage = new Bitmap(Resources.Blood, Resources.Blood.Width * Width / 1920, 
-                Resources.Blood.Height * Height / 1080);
-
-            var pillImage = new Bitmap(Resources.Pill, Resources.Pill.Width * Width / 1920,
-                Resources.Pill.Height * Height / 1080);
-
-            var intrauterineDeviceImage = new Bitmap(Resources.Spiral, 
-                Resources.Spiral.Width * Width / 1920, 
-                Resources.Spiral.Height * Height / 1080);
-
-            var otherSpermImage = new Bitmap(Resources.Sperm, Resources.Sperm.Width * Width / 1920,
-                Resources.Sperm.Height * Height / 1080);
-
-            var dnaImage = new Bitmap(Resources.Dna, Resources.Dna.Width * Width / 1920, 
-                Resources.Dna.Height * Height / 1080);
 
             gameDrawing = (sender, args) =>
             {
@@ -172,14 +149,16 @@ namespace Fight_for_The_Life.Views
                 var highestText = "Highest Score: " + game.HighestScore;
                 var indent = (int) (Game.FieldHeight * 0.26993006993);
                 var coreModel = game.Sperm.Core.GetModel();
-                args.Graphics.DrawImage(image, 0, 0);
+
+                args.Graphics.DrawImage(images.Background, 0, 0);
                 args.Graphics.DrawString(scoreText, font, new SolidBrush(Color.White), new PointF(0, 0));
                 args.Graphics.DrawString(highestText, font, Brushes.White, new PointF(1050 * Width / 1920f, 0));
-                args.Graphics.DrawImage(coreImage, new Point(coreModel.X + coreModel.Width - coreImage.Width,
-                    coreModel.Location.Y - (coreImage.Height - coreModel.Height) / 2 + indent));
-                args.Graphics.DrawImage(spermImage, new Point(game.Sperm.Model.Width - spermImage.Width,
-                    game.Sperm.Location.Y - (spermImage.Height - game.Sperm.Model.Height) / 2 + indent));
-                DrawGameObjects(args, bloodImage, intrauterineDeviceImage, pillImage, otherSpermImage, dnaImage, indent);
+                args.Graphics.DrawImage(images.Core, new Point(coreModel.X + coreModel.Width - images.Core.Width,
+                    coreModel.Location.Y - (images.Core.Height - coreModel.Height) / 2 + indent));
+                args.Graphics.DrawImage(images.Sperm, new Point(game.Sperm.Model.Width - images.Sperm.Width,
+                    game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent));
+
+                DrawGameObjects(args, indent);
             };
             Paint += gameDrawing;
 
@@ -187,36 +166,35 @@ namespace Fight_for_The_Life.Views
             KeyDown += onKeyDown;
         }
 
-        private void DrawGameObjects(PaintEventArgs args, Bitmap bloodImage, Bitmap intrauterineDeviceImage, 
-            Bitmap pillImage, Bitmap otherSpermImage, Bitmap dnaImage, int indent)
+        private void DrawGameObjects(PaintEventArgs args, int indent)
         {
             foreach (var gameObject in game.GameObjects)
             {
                 var gameObjectModel = gameObject.GetModel();
                 if (gameObject is Blood)
-                    args.Graphics.DrawImage(bloodImage, new Point(
-                        gameObjectModel.X + gameObjectModel.Width - bloodImage.Width,
-                        gameObjectModel.Location.Y - (bloodImage.Height - gameObjectModel.Height) / 2 + indent));
+                    args.Graphics.DrawImage(images.Blood, new Point(
+                        gameObjectModel.X + gameObjectModel.Width - images.Blood.Width,
+                        gameObjectModel.Location.Y - (images.Blood.Height - gameObjectModel.Height) / 2 + indent));
 
                 if (gameObject is IntrauterineDevice)
-                    args.Graphics.DrawImage(intrauterineDeviceImage, new Point(
+                    args.Graphics.DrawImage(images.IntrauterineDevice, new Point(
                         gameObjectModel.X,
-                        gameObjectModel.Location.Y - (intrauterineDeviceImage.Height - gameObjectModel.Height) / 2 + indent));
+                        gameObjectModel.Location.Y - (images.IntrauterineDevice.Height - gameObjectModel.Height) / 2 + indent));
 
                 if (gameObject is BirthControl)
-                    args.Graphics.DrawImage(pillImage, new Point(
+                    args.Graphics.DrawImage(images.BirthControl, new Point(
                         gameObjectModel.X,
-                        gameObjectModel.Location.Y - (pillImage.Height - gameObjectModel.Height) / 2 + indent));
+                        gameObjectModel.Location.Y - (images.BirthControl.Height - gameObjectModel.Height) / 2 + indent));
 
                 if (gameObject is OtherSperm)
-                    args.Graphics.DrawImage(otherSpermImage, new Point(
+                    args.Graphics.DrawImage(images.OtherSperm, new Point(
                         gameObjectModel.X,
-                        gameObjectModel.Location.Y - (otherSpermImage.Height - gameObjectModel.Height) / 2 + indent));
+                        gameObjectModel.Location.Y - (images.OtherSperm.Height - gameObjectModel.Height) / 2 + indent));
 
                 if (gameObject is Dna)
-                    args.Graphics.DrawImage(dnaImage, new Point(
+                    args.Graphics.DrawImage(images.Dna, new Point(
                         gameObjectModel.X,
-                        gameObjectModel.Location.Y - (dnaImage.Height - gameObjectModel.Height) / 2 + indent));
+                        gameObjectModel.Location.Y - (images.Dna.Height - gameObjectModel.Height) / 2 + indent));
             }
         }
 
