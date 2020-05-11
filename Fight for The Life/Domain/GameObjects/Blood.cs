@@ -2,14 +2,14 @@
 
 namespace Fight_for_The_Life.Domain.Enemies
 {
-    public class BirthControl : Enemy
+    public class Blood : GameObject
     {
-        private const double VelocityCoefficient = 1.5;
+        private const double VelocityCoefficient = 1.2;
 
-        public BirthControl(int y, double spermVelocity)
+        public Blood(int y, double spermVelocity)
         {
-            HeightCoefficient = 0.16;
-            WidthCoefficient = 0.05958;
+            HeightCoefficient = 0.105;
+            WidthCoefficient = 0.0625;
             if (y > Game.FieldHeight - 1 - Game.FieldHeight * HeightCoefficient || y < 0)
                 throw new ArgumentException("Y was outside the game field!");
             Y = y;

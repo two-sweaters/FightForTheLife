@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Fight_for_The_Life.Domain.Enemies
 {
-    public class OtherSperm : Enemy
+    public class OtherSperm : GameObject
     {
 
         public OtherSperm(int y, double spermVelocity)

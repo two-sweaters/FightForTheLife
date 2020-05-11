@@ -2,7 +2,7 @@
 
 namespace Fight_for_The_Life.Domain.Enemies
 {
-    public class Enemy
+    public class GameObject
     {
         protected int Y;
         protected double Velocity;

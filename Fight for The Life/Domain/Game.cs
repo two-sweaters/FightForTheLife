@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Fight_for_The_Life.Domain.Enemies;
+using Fight_for_The_Life.Domain.GameObjects;
 using Fight_for_The_Life.Views;
 
 namespace Fight_for_The_Life.Domain
@@ -34,13 +35,26 @@ namespace Fight_for_The_Life.Domain
         }
 
         private double gameTimeInSeconds;
+        private double shieldTimeInSeconds;
         private double emptyFieldTime;
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private const double AccelerationCoefficient = 1.25;
         public readonly Sperm Sperm = new Sperm();
-        public HashSet<Enemy> LivingEnemies { get; private set; } = new HashSet<Enemy>();
+        public HashSet<GameObject> GameObjects { get; private set; } = new HashSet<GameObject>();
         public bool IsGameOver { get; private set; }
         private readonly Random rand = new Random();
+        public double ScoreCoefficient { get; private set; }
+        public int ShieldMaxTimeInSeconds { get; private set; }
+        public int MagnetMaxTime { get; private set; }
+        public int DnaAmount { get; private set; }
+        public int HighestScore { get; private set; }
+
+        public Game(int dnaAmount, int highestScore)
+        {
+            DnaAmount = dnaAmount;
+            HighestScore = highestScore;
+        }
+
 
         // пришлось изменить модель подсчета очков,
         // так как в прошлой версии очки зависили от разрешения окна
@@ -66,9 +80,9 @@ namespace Fight_for_The_Life.Domain
         public void IncreaseGameTimeInSeconds(double seconds)
         {
             gameTimeInSeconds += seconds;
-            foreach (var enemy in LivingEnemies)
+            foreach (var gameObject in GameObjects)
             {
-                enemy.TimeAliveInSeconds += seconds;
+                gameObject.TimeAliveInSeconds += seconds;
             }
 
             if (Sperm.Core.State != CoreState.InsideSperm)
@@ -77,7 +91,7 @@ namespace Fight_for_The_Life.Domain
             if (Sperm.Core.State == CoreState.Flying)
                 Sperm.Core.flightTimeInSeconds += seconds;
 
-            if (LivingEnemies.Count == 0)
+            if (GameObjects.Count == 0)
                 emptyFieldTime += seconds;
         }
 
@@ -89,53 +103,64 @@ namespace Fight_for_The_Life.Domain
         // собираюсь вызывать из формы каждые 50мс => раз в 2с в среднем появляется враг
         public void UpdateGame(double coreFlightTime = 0)
         {
+            var score = GetScore();
+            if (score > HighestScore)
+                HighestScore = score;
+
             var number = rand.Next(40);
             if (number == 1 || emptyFieldTime > 3)
-                GenerateRandomEnemy();
+                GenerateRandomGameObject();
 
             CheckAndUpdateCore();
             if (IsGameOver)
                 return;
 
-            CheckAndUpdateLivingEnemies();
+            CheckAndUpdateGameObjects();
         }
 
-        private void CheckAndUpdateLivingEnemies()
+        private void CheckAndUpdateGameObjects()
         {
             var coreModel = Sperm.Core.GetModel();
-            var newLivingEnemies = new HashSet<Enemy>(LivingEnemies);
-            foreach (var enemy in LivingEnemies)
+            var newGameObjects = new HashSet<GameObject>(GameObjects);
+            foreach (var gameObject in GameObjects)
             {
-                var enemyModel = enemy.GetModel();
-                if (enemy is OtherSperm)
+                var objectModel = gameObject.GetModel();
+                if (gameObject is OtherSperm)
                 {
-                    if (enemyModel.X > FieldWidth)
+                    if (objectModel.X > FieldWidth)
                     {
                         IsGameOver = true;
                         return;
                     }
 
-                    if (coreModel.IntersectsWith(enemyModel) && Sperm.Core.State != CoreState.InsideSperm)
+                    if (coreModel.IntersectsWith(objectModel) && Sperm.Core.State != CoreState.InsideSperm)
                     {
-                        newLivingEnemies.Remove(enemy);
+                        newGameObjects.Remove(gameObject);
                         Sperm.Core.Stop(GetVelocityInPixelsPerSecond());
                     }
                 }
-
-                else
+                else if (gameObject is Dna)
                 {
-                    if (enemyModel.IntersectsWith(Sperm.Model))
+                    if (objectModel.IntersectsWith(Sperm.Model))
+                    {
+                        DnaAmount++;
+                        newGameObjects.Remove(gameObject);
+                    }
+                }
+                else 
+                {
+                    if (objectModel.IntersectsWith(Sperm.Model))
                     {
                         IsGameOver = true;
                         return;
                     }
 
-                    if (enemyModel.X < -enemyModel.Width || enemyModel.X > FieldWidth)
-                        newLivingEnemies.Remove(enemy);
+                    if (objectModel.X < -objectModel.Width || objectModel.X > FieldWidth)
+                        newGameObjects.Remove(gameObject);
                 }
             }
 
-            LivingEnemies = newLivingEnemies;
+            GameObjects = newGameObjects;
         }
 
         private void CheckAndUpdateCore()
@@ -153,25 +178,28 @@ namespace Fight_for_The_Life.Domain
             }
         }
 
-        public void GenerateRandomEnemy()
+        public void GenerateRandomGameObject()
         {
-            var number = rand.Next(4);
+            var number = rand.Next(5);
             var y = rand.Next((int)(FieldHeight - 1 - FieldHeight * 0.16));
             var velocity = GetVelocityInPixelsPerSecond();
-            if (LivingEnemies.Count < 3)
+            if (GameObjects.Count < 3)
             {
                 if (number == 0)
-                    LivingEnemies.Add(new BirthControl(y, velocity));
+                    GameObjects.Add(new BirthControl(y, velocity));
 
                 else if (number == 1)
-                    LivingEnemies.Add(new Blood(y, velocity));
+                    GameObjects.Add(new Blood(y, velocity));
 
-                else if (LivingEnemies.All(e => !(e is OtherSperm) || e.GetLocation().X > Game.FieldWidth / 2)
+                else if (GameObjects.All(e => !(e is OtherSperm) || e.GetLocation().X > Game.FieldWidth / 2)
                          && number == 2)
-                    LivingEnemies.Add(new OtherSperm(y, velocity));
+                    GameObjects.Add(new OtherSperm(y, velocity));
 
-                else if (LivingEnemies.All(e => !(e is IntrauterineDevice)))
-                    LivingEnemies.Add(new IntrauterineDevice(velocity));
+                else if (GameObjects.All(e => !(e is IntrauterineDevice)) && number == 3)
+                    GameObjects.Add(new IntrauterineDevice(velocity));
+
+                else
+                    GameObjects.Add(new Dna(y, velocity));
             }
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Fight_for_The_Life.Domain.Enemies
 {
-    public class IntrauterineDevice : Enemy
+    public class IntrauterineDevice : GameObject
     {
         public IntrauterineDevice(double spermVelocity)
         {

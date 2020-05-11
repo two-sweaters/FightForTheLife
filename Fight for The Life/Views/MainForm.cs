@@ -12,17 +12,18 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Fight_for_The_Life.Domain;
 using Fight_for_The_Life.Domain.Enemies;
+using Fight_for_The_Life.Domain.GameObjects;
 using Fight_for_The_Life.Properties;
 
 namespace Fight_for_The_Life.Views
 {
+    //TODO отрефакторить
     public partial class MainForm : Form
     {
         private readonly TableLayoutPanel layoutTable = new TableLayoutPanel();
         private readonly Timer timer = new Timer(){ Interval = 50 };
         private Game game;
         private KeyEventHandler onKeyDown;
-        private int highestScore;
         private PaintEventHandler gameDrawing;
         public MainForm()
         {
@@ -49,9 +50,6 @@ namespace Fight_for_The_Life.Views
                 game.UpdateGame();
                 if (game.IsGameOver)
                     GameOver();
-                var score = game.GetScore();
-                if (score > highestScore)
-                    highestScore = score;
                 Invalidate();
             };
 
@@ -63,25 +61,32 @@ namespace Fight_for_The_Life.Views
         {
             var saveData = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
             var saveInfo = string.Join("", new string(Encoding.Unicode.GetChars(saveData)));
+            var infoArray = saveInfo.Split();
+            var highestScore = 0;
+            var dnaAmount = 0;
 
-            if (saveInfo.Split().Length == 2)
-            {
-                highestScore = int.Parse(saveInfo.Split()[1]);
-            }
-            else
-                highestScore = 0;
+            if (infoArray.Length >= 4)
+                dnaAmount = int.Parse(infoArray[3]);
+                
+            if (saveInfo.Split().Length >= 2)
+                highestScore = int.Parse(infoArray[1]);
+
+            game = new Game(dnaAmount, highestScore);
         }
 
-        private bool IsThereSaveFile()
+        private void MainMenuInitialization()
         {
-            return Directory
-                .GetFiles(".")
-                .Any(f => f.Equals(Path.Combine(Directory.GetCurrentDirectory(), "save.dat")));
-        }
-
-        private void MainMenuInitialization(int textSizeS = 24, int textSizeL = 54)
-        {
+            var dnaImage = new Bitmap(Resources.Dna, Resources.Dna.Width * Width / 1920, 
+                Resources.Dna.Height * Height / 1080);
+            var font = new Font("Segoe Print", (int)(70 * Width / 1920d),
+                FontStyle.Bold, GraphicsUnit.World);
             Paint -= gameDrawing;
+            gameDrawing = (sender, args) =>
+            {
+                args.Graphics.DrawImage(dnaImage, new Point(20, 20));
+                args.Graphics.DrawString(game.DnaAmount.ToString(), font, Brushes.White, 40 + dnaImage.Width, 10);
+            };
+            Paint += gameDrawing;
             layoutTable.Controls.Clear();
             layoutTable.BackColor = Color.Transparent;
             BackgroundImage = Resources.MainMenuBackground;
@@ -92,6 +97,7 @@ namespace Fight_for_The_Life.Views
                 AnchorStyles.Right, (sender, args) => ControlMenuInitialization());
             AddButton("Противники", 54, Color.Black, 2, 4,
                 AnchorStyles.Left, (sender, args) => EnemiesFirstPageInitialization());
+
             Invalidate();
         }
 
@@ -130,10 +136,10 @@ namespace Fight_for_The_Life.Views
             layoutTable.Controls.Clear();
             layoutTable.BackColor = Color.Transparent;
             BackgroundImage = null;
-            var font = new Font("Segoe Print", (int) (70 * Width / 1920d), 
+            var font = new Font("Segoe Print", (int)(70 * Width / 1920d),
                 FontStyle.Bold, GraphicsUnit.World);
 
-            game = new Game();
+            CheckSave();
             timer.Start();
 
             var image = new Bitmap(Resources.Background, Width, Height);
@@ -157,10 +163,13 @@ namespace Fight_for_The_Life.Views
             var otherSpermImage = new Bitmap(Resources.Sperm, Resources.Sperm.Width * Width / 1920,
                 Resources.Sperm.Height * Height / 1080);
 
+            var dnaImage = new Bitmap(Resources.Dna, Resources.Dna.Width * Width / 1920, 
+                Resources.Dna.Height * Height / 1080);
+
             gameDrawing = (sender, args) =>
             {
                 var scoreText = "Score: " + game.GetScore();
-                var highestText = "Highest Score: " + highestScore;
+                var highestText = "Highest Score: " + game.HighestScore;
                 var indent = (int) (Game.FieldHeight * 0.26993006993);
                 var coreModel = game.Sperm.Core.GetModel();
                 args.Graphics.DrawImage(image, 0, 0);
@@ -170,7 +179,7 @@ namespace Fight_for_The_Life.Views
                     coreModel.Location.Y - (coreImage.Height - coreModel.Height) / 2 + indent));
                 args.Graphics.DrawImage(spermImage, new Point(game.Sperm.Model.Width - spermImage.Width,
                     game.Sperm.Location.Y - (spermImage.Height - game.Sperm.Model.Height) / 2 + indent));
-                DrawEnemies(args, bloodImage, intrauterineDeviceImage, pillImage, otherSpermImage, indent);
+                DrawGameObjects(args, bloodImage, intrauterineDeviceImage, pillImage, otherSpermImage, dnaImage, indent);
             };
             Paint += gameDrawing;
 
@@ -178,31 +187,36 @@ namespace Fight_for_The_Life.Views
             KeyDown += onKeyDown;
         }
 
-        private void DrawEnemies(PaintEventArgs args, Bitmap bloodImage, Bitmap intrauterineDeviceImage, 
-            Bitmap pillImage, Bitmap otherSpermImage, int indent)
+        private void DrawGameObjects(PaintEventArgs args, Bitmap bloodImage, Bitmap intrauterineDeviceImage, 
+            Bitmap pillImage, Bitmap otherSpermImage, Bitmap dnaImage, int indent)
         {
-            foreach (var enemy in game.LivingEnemies)
+            foreach (var gameObject in game.GameObjects)
             {
-                var enemyModel = enemy.GetModel();
-                if (enemy is Blood)
+                var gameObjectModel = gameObject.GetModel();
+                if (gameObject is Blood)
                     args.Graphics.DrawImage(bloodImage, new Point(
-                        enemyModel.X + enemyModel.Width - bloodImage.Width,
-                        enemyModel.Location.Y - (bloodImage.Height - enemyModel.Height) / 2 + indent));
+                        gameObjectModel.X + gameObjectModel.Width - bloodImage.Width,
+                        gameObjectModel.Location.Y - (bloodImage.Height - gameObjectModel.Height) / 2 + indent));
 
-                if (enemy is IntrauterineDevice)
+                if (gameObject is IntrauterineDevice)
                     args.Graphics.DrawImage(intrauterineDeviceImage, new Point(
-                        enemyModel.X,
-                        enemyModel.Location.Y - (intrauterineDeviceImage.Height - enemyModel.Height) / 2 + indent));
+                        gameObjectModel.X,
+                        gameObjectModel.Location.Y - (intrauterineDeviceImage.Height - gameObjectModel.Height) / 2 + indent));
 
-                if (enemy is BirthControl)
+                if (gameObject is BirthControl)
                     args.Graphics.DrawImage(pillImage, new Point(
-                        enemyModel.X,
-                        enemyModel.Location.Y - (pillImage.Height - enemyModel.Height) / 2 + indent));
+                        gameObjectModel.X,
+                        gameObjectModel.Location.Y - (pillImage.Height - gameObjectModel.Height) / 2 + indent));
 
-                if (enemy is OtherSperm)
+                if (gameObject is OtherSperm)
                     args.Graphics.DrawImage(otherSpermImage, new Point(
-                        enemyModel.X,
-                        enemyModel.Location.Y - (otherSpermImage.Height - enemyModel.Height) / 2 + indent));
+                        gameObjectModel.X,
+                        gameObjectModel.Location.Y - (otherSpermImage.Height - gameObjectModel.Height) / 2 + indent));
+
+                if (gameObject is Dna)
+                    args.Graphics.DrawImage(dnaImage, new Point(
+                        gameObjectModel.X,
+                        gameObjectModel.Location.Y - (dnaImage.Height - gameObjectModel.Height) / 2 + indent));
             }
         }
 
@@ -211,12 +225,10 @@ namespace Fight_for_The_Life.Views
             timer.Stop();
             KeyDown -= onKeyDown;
             layoutTable.BackColor = Color.FromArgb(128, 0, 0, 0);
-            //if (IsThereSaveFile())
-            //    File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
 
             File.WriteAllBytes(
                 Path.Combine(Directory.GetCurrentDirectory(), "save.dat"), 
-                Encoding.Unicode.GetBytes("HighestScore " + highestScore));
+                Encoding.Unicode.GetBytes("HighestScore " + game.HighestScore + "\nDnaAmount " + game.DnaAmount));
 
             AddButton("Esc - выход в меню", 24, Color.White, 0, 5, 
                 AnchorStyles.Left, (sender, args) =>

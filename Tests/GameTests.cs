@@ -38,8 +38,8 @@ namespace Tests
         public void GenerateRandomEnemy_ShouldCreateAnyEnemy()
         {
             var game = new Game();
-            game.GenerateRandomEnemy();
-            Assert.IsNotEmpty(game.LivingEnemies);
+            game.GenerateRandomGameObject();
+            Assert.IsNotEmpty(game.GameObjects);
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace Tests
         public void UpdateGame_ShouldEndGame_IfOtherSpermFlyAway()
         {
             var game = new Game();
-            game.LivingEnemies.Add(new OtherSperm(5, 2000));
+            game.GameObjects.Add(new OtherSperm(5, 2000));
             game.UpdateGame(1);
             Assert.IsTrue(game.IsGameOver);
         }
@@ -64,7 +64,7 @@ namespace Tests
         public void UpdateGame_ShouldEndGame_AfterSpermConflictWithBlood()
         {
             var game = new Game();
-            game.LivingEnemies.Add(new Blood(game.Sperm.Location.Y, 1500));
+            game.GameObjects.Add(new Blood(game.Sperm.Location.Y, 1500));
             game.UpdateGame(1);
             Assert.IsTrue(game.IsGameOver);
         }
@@ -73,9 +73,9 @@ namespace Tests
         public void UpdateGame_ShouldRemoveEnemy_IfEnemyFlyAway()
         {
             var game = new Game();
-            game.LivingEnemies.Add(new Blood(game.Sperm.Location.Y, 2000));
+            game.GameObjects.Add(new Blood(game.Sperm.Location.Y, 2000));
             game.UpdateGame(1);
-            Assert.IsEmpty(game.LivingEnemies);
+            Assert.IsEmpty(game.GameObjects);
         }
 
         [Test]
@@ -86,17 +86,17 @@ namespace Tests
             {
                 game.UpdateGame(i * 10);
             }
-            Assert.IsNotEmpty(game.LivingEnemies);
+            Assert.IsNotEmpty(game.GameObjects);
         }
 
         [Test]
         public void UpdateGame_ShouldRemoveOtherSperm_IfCoreHitIt()
         {
             var game = new Game();
-            game.LivingEnemies.Add(new OtherSperm(game.Sperm.Location.Y, 50));
+            game.GameObjects.Add(new OtherSperm(game.Sperm.Location.Y, 50));
             game.Sperm.Core.Shot(50);
             game.UpdateGame(1);
-            Assert.IsEmpty(game.LivingEnemies);
+            Assert.IsEmpty(game.GameObjects);
         }
     }
 }

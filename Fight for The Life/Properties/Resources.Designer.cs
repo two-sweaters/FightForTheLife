@@ -113,6 +113,16 @@ namespace Fight_for_The_Life.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Dna {
+            get {
+                object obj = ResourceManager.GetObject("Dna", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap EnemiesSecond {
             get {
                 object obj = ResourceManager.GetObject("EnemiesSecond", resourceCulture);
