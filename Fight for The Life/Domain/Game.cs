@@ -6,7 +6,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Fight_for_The_Life.Domain.Enemies;
 using Fight_for_The_Life.Domain.GameObjects;
 using Fight_for_The_Life.Views;
 
@@ -43,22 +42,21 @@ namespace Fight_for_The_Life.Domain
         public HashSet<GameObject> GameObjects { get; private set; } = new HashSet<GameObject>();
         public bool IsGameOver { get; private set; }
         private readonly Random rand = new Random();
-        public double ScoreCoefficient { get; private set; }
-        public int ShieldMaxTimeInSeconds { get; private set; }
-        public int MagnetMaxTime { get; private set; }
-        public int DnaAmount { get; private set; }
+        public double ScoreCoefficient { get; set; }
+        public int ShieldMaxTimeInSeconds { get; set; }
+        public int DnaAmount { get; set; }
         public int HighestScore { get; private set; }
+        public int ScoreCoefficientCost => (int)(ScoreCoefficient / 0.5 - 2) * 5 + 25;
+        public int ShieldMaxTimeCost => ShieldMaxTimeInSeconds / 5 * 5 + 25;
 
-        public Game(int dnaAmount, int highestScore)
+        public Game(int dnaAmount, int highestScore, double scoreCoefficient, int shieldMaxTimeInSeconds)
         {
             DnaAmount = dnaAmount;
             HighestScore = highestScore;
+            ScoreCoefficient = scoreCoefficient;
+            ShieldMaxTimeInSeconds = shieldMaxTimeInSeconds;
         }
 
-
-        // пришлось изменить модель подсчета очков,
-        // так как в прошлой версии очки зависили от разрешения окна
-        // теперь очки = кол-во пройденых окон * 1000
         public int GetScore()
         {
             var segmentsAmount = (int)(gameTimeInSeconds / 15);
@@ -74,7 +72,7 @@ namespace Fight_for_The_Life.Domain
 
             distance += lastSegmentTime * velocity;
             var screensAmount = distance / FieldWidth;
-            return (int)(screensAmount * 1000);
+            return (int)(screensAmount * 1000 * ScoreCoefficient);
         }
 
         public void IncreaseGameTimeInSeconds(double seconds)
@@ -84,6 +82,9 @@ namespace Fight_for_The_Life.Domain
             {
                 gameObject.TimeAliveInSeconds += seconds;
             }
+
+            if (Sperm.IsShieldActivated)
+                shieldTimeInSeconds += seconds;
 
             if (Sperm.Core.State != CoreState.InsideSperm)
                 Sperm.Core.timeAfterShotInSeconds += seconds;
@@ -100,12 +101,14 @@ namespace Fight_for_The_Life.Domain
             return Math.Pow(AccelerationCoefficient, (int)(gameTimeInSeconds / 15)) * StartVelocity;
         }
 
-        // собираюсь вызывать из формы каждые 50мс => раз в 2с в среднем появляется враг
-        public void UpdateGame(double coreFlightTime = 0)
+        public void UpdateGame()
         {
             var score = GetScore();
             if (score > HighestScore)
                 HighestScore = score;
+
+            if (shieldTimeInSeconds > ShieldMaxTimeInSeconds)
+                Sperm.IsShieldActivated = false;
 
             var number = rand.Next(40);
             if (number == 1 || emptyFieldTime > 3)
@@ -139,6 +142,15 @@ namespace Fight_for_The_Life.Domain
                         Sperm.Core.Stop(GetVelocityInPixelsPerSecond());
                     }
                 }
+                else if (gameObject is Shield)
+                {
+                    if (objectModel.IntersectsWith(Sperm.Model))
+                    {
+                        newGameObjects.Remove(gameObject);
+                        Sperm.IsShieldActivated = true;
+                        shieldTimeInSeconds = 0;
+                    }
+                }
                 else if (gameObject is Dna)
                 {
                     if (objectModel.IntersectsWith(Sperm.Model))
@@ -149,15 +161,15 @@ namespace Fight_for_The_Life.Domain
                 }
                 else 
                 {
-                    if (objectModel.IntersectsWith(Sperm.Model))
+                    if (objectModel.IntersectsWith(Sperm.Model) && !Sperm.IsShieldActivated)
                     {
                         IsGameOver = true;
                         return;
                     }
-
-                    if (objectModel.X < -objectModel.Width || objectModel.X > FieldWidth)
-                        newGameObjects.Remove(gameObject);
                 }
+
+                if (objectModel.X < -objectModel.Width || objectModel.X > FieldWidth)
+                    newGameObjects.Remove(gameObject);
             }
 
             GameObjects = newGameObjects;
@@ -180,26 +192,29 @@ namespace Fight_for_The_Life.Domain
 
         public void GenerateRandomGameObject()
         {
-            var number = rand.Next(5);
+            var number = rand.Next(10);
             var y = rand.Next((int)(FieldHeight - 1 - FieldHeight * 0.16));
             var velocity = GetVelocityInPixelsPerSecond();
             if (GameObjects.Count < 3)
             {
-                if (number == 0)
+                if (number == 0 || number == 1)
                     GameObjects.Add(new BirthControl(y, velocity));
 
-                else if (number == 1)
+                else if (number == 2 || number == 3)
                     GameObjects.Add(new Blood(y, velocity));
 
                 else if (GameObjects.All(e => !(e is OtherSperm) || e.GetLocation().X > Game.FieldWidth / 2)
-                         && number == 2)
+                         && (number == 4 || number == 5)&& !Sperm.IsShieldActivated)
                     GameObjects.Add(new OtherSperm(y, velocity));
 
-                else if (GameObjects.All(e => !(e is IntrauterineDevice)) && number == 3)
+                else if (GameObjects.All(e => !(e is IntrauterineDevice)) && (number == 6 || number == 7))
                     GameObjects.Add(new IntrauterineDevice(velocity));
 
-                else
+                else if (number == 8)
                     GameObjects.Add(new Dna(y, velocity));
+
+                else if (number == 9 && ShieldMaxTimeInSeconds > 0)
+                    GameObjects.Add(new Shield(y, velocity));
             }
         }
     }

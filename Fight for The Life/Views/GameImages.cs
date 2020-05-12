@@ -7,12 +7,15 @@ namespace Fight_for_The_Life.Views
     {
         public readonly Bitmap Background;
         public readonly Bitmap Sperm;
+        public readonly Bitmap SpermWithShield;
         public readonly Bitmap Core;
         public readonly Bitmap Blood;
         public readonly Bitmap BirthControl;
         public readonly Bitmap IntrauterineDevice; 
         public readonly Bitmap OtherSperm;
         public readonly Bitmap Dna;
+        public readonly Bitmap Shield;
+        public readonly Bitmap Shop;
 
         public GameImages(int width, int height)
         {
@@ -39,6 +42,14 @@ namespace Fight_for_The_Life.Views
 
             Dna = new Bitmap(Resources.Dna, Resources.Dna.Width * width / 1920,
                 Resources.Dna.Height * height / 1080);
+
+            Shield = new Bitmap(Resources.Shield, Resources.Shield.Width * width / 1920, 
+                Resources.Shield.Height * height / 1080);
+
+            SpermWithShield = new Bitmap(Resources.MainSpermWithShield, Resources.MainSperm.Width * width / 1920,
+                Resources.MainSperm.Height * height / 1080);
+
+            Shop = new Bitmap(Resources.Shop, width, height);
         }
     }
 }

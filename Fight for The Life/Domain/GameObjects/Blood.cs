@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Fight_for_The_Life.Domain.Enemies
+namespace Fight_for_The_Life.Domain.GameObjects
 {
     public class Blood : GameObject
     {

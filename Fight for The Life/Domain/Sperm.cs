@@ -7,6 +7,7 @@ namespace Fight_for_The_Life.Domain
     {
         public Point Location { get; private set; }
         public readonly Core Core;
+        public bool IsShieldActivated { get; set; }
         public const double HeightCoefficient = 0.1;
         public const double WidthCoefficient = 0.17;
         public static readonly int ModelHeight = (int) (Game.FieldHeight * HeightCoefficient);

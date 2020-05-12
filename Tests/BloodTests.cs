@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Threading;
-using Fight_for_The_Life.Domain.Enemies;
+using Fight_for_The_Life.Domain.GameObjects;
 
 namespace Tests
 {

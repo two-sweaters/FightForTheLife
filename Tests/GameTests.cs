@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Fight_for_The_Life.Domain;
-using Fight_for_The_Life.Domain.Enemies;
+using Fight_for_The_Life.Domain.GameObjects;
 
 namespace Tests
 {
