@@ -66,7 +66,7 @@ namespace Fight_for_The_Life.Views
             var dnaAmount = 0;
             var shieldMaxTime = 0;
             var magnetMaxTime = 0;
-            var scoreCoefficient = 1;
+            var scoreCoefficient = 1.0;
 
             if (infoArray.Length >= 2)
                 highestScore = int.Parse(infoArray[1]);
@@ -75,7 +75,7 @@ namespace Fight_for_The_Life.Views
                 dnaAmount = int.Parse(infoArray[3]);
 
             if (infoArray.Length >= 6)
-                scoreCoefficient = int.Parse(infoArray[5]);
+                scoreCoefficient = double.Parse(infoArray[5]);
 
             if (infoArray.Length >= 8)
                 shieldMaxTime = int.Parse(infoArray[7]);

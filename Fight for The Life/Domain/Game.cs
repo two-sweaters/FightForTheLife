@@ -207,30 +207,30 @@ namespace Fight_for_The_Life.Domain
 
         public void GenerateRandomGameObject()
         {
-            var number = rand.Next(12);
+            var number = rand.Next(100);
             var y = rand.Next((int)(FieldHeight - 1 - FieldHeight * 0.16));
             var velocity = GetVelocityInPixelsPerSecond();
             if (GameObjects.Count < 3)
             {
-                if (number == 0 || number == 1)
+                if (number < 15)
                     GameObjects.Add(new BirthControl(y, velocity));
 
-                else if (number == 2 || number == 3)
+                else if (number < 30)
                     GameObjects.Add(new Blood(y, velocity));
 
-                else if (CanOtherSpermSpawn() && (number == 4 || number == 5))
+                else if (CanOtherSpermSpawn() && number < 45)
                     GameObjects.Add(new OtherSperm(y, velocity));
 
-                else if (GameObjects.All(e => !(e is IntrauterineDevice)) && (number == 6 || number == 7))
+                else if (GameObjects.All(e => !(e is IntrauterineDevice)) && number < 60)
                     GameObjects.Add(new IntrauterineDevice(velocity));
 
-                else if (number == 8 || number == 11)
+                else if (number < 80)
                     GameObjects.Add(new Dna(y, velocity, Sperm));
 
-                else if (number == 9 && ShieldMaxTimeInSeconds > 0)
+                else if (number < 90 && ShieldMaxTimeInSeconds > 0 && !Sperm.IsShieldActivated)
                     GameObjects.Add(new Shield(y, velocity));
 
-                else if (number == 10 && MagnetMaxTimeInSeconds > 0)
+                else if (number < 100 && MagnetMaxTimeInSeconds > 0 && !Sperm.IsMagnetActivated)
                     GameObjects.Add(new Magnet(y, velocity));
             }
         }
@@ -238,8 +238,7 @@ namespace Fight_for_The_Life.Domain
         private bool CanOtherSpermSpawn()
         {
             return GameObjects
-                .All(e => !(e is OtherSperm) && 
-                          (!(e is IntrauterineDevice) || e.GetLocation().X > FieldWidth / 2));
+                .All(e => !(e is OtherSperm) && !(e is IntrauterineDevice));
         }
     }
 }
