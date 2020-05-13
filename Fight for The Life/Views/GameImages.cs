@@ -1,4 +1,7 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using Fight_for_The_Life.Domain.GameObjects;
 using Fight_for_The_Life.Properties;
 
 namespace Fight_for_The_Life.Views
@@ -11,13 +14,14 @@ namespace Fight_for_The_Life.Views
         public readonly Bitmap SpermWithMagnet;
         public readonly Bitmap SpermWithShieldAndMagnet;
         public readonly Bitmap Core;
-        public readonly Bitmap Blood;
-        public readonly Bitmap BirthControl;
-        public readonly Bitmap IntrauterineDevice; 
-        public readonly Bitmap OtherSperm;
+        private readonly Bitmap Blood;
+        private readonly Bitmap BirthControl;
+        private readonly Bitmap IntrauterineDevice; 
+        private readonly Bitmap OtherSperm;
         public readonly Bitmap Dna;
-        public readonly Bitmap Shield;
-        public readonly Bitmap Magnet;
+        private readonly Bitmap Shield;
+        private readonly Bitmap Magnet;
+        public readonly Dictionary<Type, Bitmap> GameObjectsImages = new Dictionary<Type, Bitmap>();
 
         public GameImages(double widthCoefficient, double heightCoefficient)
         {
@@ -36,30 +40,37 @@ namespace Fight_for_The_Life.Views
             Blood = new Bitmap(Resources.Blood, 
                 (int)(Resources.Blood.Width * widthCoefficient),
                 (int)(Resources.Blood.Height * heightCoefficient));
+            GameObjectsImages.Add(typeof(Blood), Blood);
 
             BirthControl = new Bitmap(Resources.Pill, 
                 (int)(Resources.Pill.Width * widthCoefficient),
                 (int)(Resources.Pill.Height * heightCoefficient));
+            GameObjectsImages.Add(typeof(BirthControl), BirthControl);
 
             IntrauterineDevice = new Bitmap(Resources.Spiral, 
                 (int)(Resources.Spiral.Width * widthCoefficient),
                 (int)(Resources.Spiral.Height * heightCoefficient));
+            GameObjectsImages.Add(typeof(IntrauterineDevice), IntrauterineDevice);
 
             OtherSperm = new Bitmap(Resources.Sperm, 
                 (int)(Resources.Sperm.Width * widthCoefficient),
                 (int)(Resources.Sperm.Height * heightCoefficient));
+            GameObjectsImages.Add(typeof(OtherSperm), OtherSperm);
 
             Dna = new Bitmap(Resources.Dna, 
                 (int)(Resources.Dna.Width * widthCoefficient),
                 (int)(Resources.Dna.Height * heightCoefficient));
+            GameObjectsImages.Add(typeof(Dna), Dna);
 
             Shield = new Bitmap(Resources.Shield, 
                 (int)(Resources.Shield.Width * widthCoefficient),
                 (int)(Resources.Shield.Height * heightCoefficient));
+            GameObjectsImages.Add(typeof(Shield), Shield);
 
             Magnet = new Bitmap(Resources.Magnet, 
                 (int)(Resources.Magnet.Width * widthCoefficient),
                 (int)(Resources.Magnet.Height * heightCoefficient));
+            GameObjectsImages.Add(typeof(Magnet), Magnet);
 
             SpermWithShield = new Bitmap(Resources.MainSpermWithShield, 
                 (int)(Resources.Sperm.Width * widthCoefficient),

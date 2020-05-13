@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using Fight_for_The_Life.Domain;
-using Fight_for_The_Life.Domain.GameObjects;
 using Fight_for_The_Life.Properties;
 
 namespace Fight_for_The_Life.Views
@@ -120,25 +119,10 @@ namespace Fight_for_The_Life.Views
 
         private void ShopInitialization()
         {
-            layoutTable.Controls.Clear();
+            UpdateShopButtons();
             BackgroundImage = Resources.Shop;
             var font = new Font("Segoe Print", (int)(40 * widthCoefficient),
                 FontStyle.Bold, GraphicsUnit.World);
-
-            AddButton("- Выход -", 24, Color.White, 0, 5,
-                AnchorStyles.Left, (sender, args) => MainMenuInitialization());
-
-            AddButton("Магнит + 5с\n(тек." + game.MagnetMaxTimeInSeconds + ")", 
-                40, Color.Black, 1, 1, AnchorStyles.Left, 
-                (sender, args) => TryBuy(game.MagnetMaxTimeCost, ItemToBuy.MagnetMaxTime));
-
-            AddButton("Щит +5с\n(тек." + game.ShieldMaxTimeInSeconds + ")", 
-                40, Color.Black, 1, 2, AnchorStyles.Left, 
-                (sender, args) => TryBuy(game.ShieldMaxTimeCost, ItemToBuy.ShieldMaxTime));
-
-            AddButton("Множитель очков +0.5\n(тек. " + game.ScoreCoefficient + ")",
-                40, Color.Black, 1, 3, AnchorStyles.Left, 
-                (sender, args) => TryBuy(game.ScoreCoefficientCost, ItemToBuy.ScoreCoefficient));
 
             gameDrawing = (sender, args) =>
             {
@@ -258,41 +242,10 @@ namespace Fight_for_The_Life.Views
             foreach (var gameObject in game.GameObjects)
             {
                 var gameObjectModel = gameObject.GetModel();
-
-                if (gameObject is Blood)
-                    args.Graphics.DrawImage(images.Blood, new Point(
-                        gameObjectModel.X + gameObjectModel.Width - images.Blood.Width,
-                        gameObjectModel.Y - (images.Blood.Height - gameObjectModel.Height) / 2 + indent));
-
-                if (gameObject is IntrauterineDevice)
-                    args.Graphics.DrawImage(images.IntrauterineDevice, new Point(
-                        gameObjectModel.X,
-                        gameObjectModel.Y - (images.IntrauterineDevice.Height - gameObjectModel.Height) / 2 + indent));
-
-                if (gameObject is BirthControl)
-                    args.Graphics.DrawImage(images.BirthControl, new Point(
-                        gameObjectModel.X,
-                        gameObjectModel.Y - (images.BirthControl.Height - gameObjectModel.Height) / 2 + indent));
-
-                if (gameObject is OtherSperm)
-                    args.Graphics.DrawImage(images.OtherSperm, new Point(
-                        gameObjectModel.X,
-                        gameObjectModel.Y - (images.OtherSperm.Height - gameObjectModel.Height) / 2 + indent));
-
-                if (gameObject is Dna)
-                    args.Graphics.DrawImage(images.Dna, new Point(
-                        gameObjectModel.X,
-                        gameObjectModel.Y - (images.Dna.Height - gameObjectModel.Height) / 2 + indent));
-
-                if (gameObject is Shield)
-                    args.Graphics.DrawImage(images.Shield, new Point(
-                        gameObjectModel.X,
-                        gameObjectModel.Y - (images.Dna.Height - gameObjectModel.Height) / 2 + indent));
-
-                if (gameObject is Magnet)
-                    args.Graphics.DrawImage(images.Magnet, new Point(
-                        gameObjectModel.X,
-                        gameObjectModel.Y - (images.Magnet.Height - gameObjectModel.Height) / 2 + indent));
+                var image = images.GameObjectsImages[gameObject.GetType()];
+                args.Graphics.DrawImage(image, 
+                    gameObjectModel.X,
+                    gameObjectModel.Y - (image.Height - gameObjectModel.Height) / 2 + indent);
             }
         }
 
@@ -414,6 +367,7 @@ namespace Fight_for_The_Life.Views
                     Path.Combine(Directory.GetCurrentDirectory(), "save.dat"),
                     Encoding.Unicode.GetBytes(SaveData));
 
+                UpdateShopButtons();
                 Invalidate();
             }
         }
@@ -439,6 +393,26 @@ namespace Fight_for_The_Life.Views
             {
                 PauseGame();
             }
+        }
+
+        private void UpdateShopButtons()
+        {
+            layoutTable.Controls.Clear();
+
+            AddButton("- Выход -", 24, Color.White, 0, 5,
+                AnchorStyles.Left, (sender, args) => MainMenuInitialization());
+
+            AddButton("Магнит + 5с\n(тек. " + game.MagnetMaxTimeInSeconds + ")",
+                40, Color.Black, 1, 1, AnchorStyles.Left,
+                (sender, args) => TryBuy(game.MagnetMaxTimeCost, ItemToBuy.MagnetMaxTime));
+
+            AddButton("Щит +5с\n(тек. " + game.ShieldMaxTimeInSeconds + ")",
+                40, Color.Black, 1, 2, AnchorStyles.Left,
+                (sender, args) => TryBuy(game.ShieldMaxTimeCost, ItemToBuy.ShieldMaxTime));
+
+            AddButton("Множитель очков +0.5\n(тек. x" + game.ScoreCoefficient + ")",
+                40, Color.Black, 1, 3, AnchorStyles.Left,
+                (sender, args) => TryBuy(game.ScoreCoefficientCost, ItemToBuy.ScoreCoefficient));
         }
 
         protected override CreateParams CreateParams

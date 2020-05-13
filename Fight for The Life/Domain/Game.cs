@@ -60,7 +60,7 @@ namespace Fight_for_The_Life.Domain
         public int GetScore()
         {
             var segmentsAmount = (int)(gameTimeInSeconds / 15);
-            var lastSegmentTime = gameTimeInSeconds % 60;
+            var lastSegmentTime = gameTimeInSeconds % 15;
             var distance = 0.0;
             var velocity = StartVelocity;
 
