@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Fight_for_The_Life.Domain.GameObjects;
-using Fight_for_The_Life.Views;
 
 namespace Fight_for_The_Life.Domain
 {
@@ -35,6 +30,7 @@ namespace Fight_for_The_Life.Domain
 
         private double gameTimeInSeconds;
         private double shieldTimeInSeconds;
+        private double magnetTimeInSeconds;
         private double emptyFieldTime;
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private const double AccelerationCoefficient = 1.25;
@@ -44,17 +40,21 @@ namespace Fight_for_The_Life.Domain
         private readonly Random rand = new Random();
         public double ScoreCoefficient { get; set; }
         public int ShieldMaxTimeInSeconds { get; set; }
+        public int MagnetMaxTimeInSeconds { get; set; }
         public int DnaAmount { get; set; }
         public int HighestScore { get; private set; }
         public int ScoreCoefficientCost => (int)(ScoreCoefficient / 0.5 - 2) * 5 + 25;
         public int ShieldMaxTimeCost => ShieldMaxTimeInSeconds / 5 * 5 + 25;
+        public int MagnetMaxTimeCost => MagnetMaxTimeInSeconds / 5 * 5 + 25;
 
-        public Game(int dnaAmount, int highestScore, double scoreCoefficient, int shieldMaxTimeInSeconds)
+        public Game(int dnaAmount, int highestScore, double scoreCoefficient, 
+            int shieldMaxTimeInSeconds, int magnetMaxTimeInSeconds)
         {
             DnaAmount = dnaAmount;
             HighestScore = highestScore;
             ScoreCoefficient = scoreCoefficient;
             ShieldMaxTimeInSeconds = shieldMaxTimeInSeconds;
+            MagnetMaxTimeInSeconds = magnetMaxTimeInSeconds;
         }
 
         public int GetScore()
@@ -86,6 +86,9 @@ namespace Fight_for_The_Life.Domain
             if (Sperm.IsShieldActivated)
                 shieldTimeInSeconds += seconds;
 
+            if (Sperm.IsMagnetActivated)
+                magnetTimeInSeconds += seconds;
+
             if (Sperm.Core.State != CoreState.InsideSperm)
                 Sperm.Core.timeAfterShotInSeconds += seconds;
 
@@ -109,6 +112,9 @@ namespace Fight_for_The_Life.Domain
 
             if (shieldTimeInSeconds > ShieldMaxTimeInSeconds)
                 Sperm.IsShieldActivated = false;
+
+            if (magnetTimeInSeconds > MagnetMaxTimeInSeconds)
+                Sperm.IsMagnetActivated = false;
 
             var number = rand.Next(40);
             if (number == 1 || emptyFieldTime > 3)
@@ -149,6 +155,15 @@ namespace Fight_for_The_Life.Domain
                         newGameObjects.Remove(gameObject);
                         Sperm.IsShieldActivated = true;
                         shieldTimeInSeconds = 0;
+                    }
+                }
+                else if (gameObject is Magnet)
+                {
+                    if (objectModel.IntersectsWith(Sperm.Model))
+                    {
+                        newGameObjects.Remove(gameObject);
+                        Sperm.IsMagnetActivated = true;
+                        magnetTimeInSeconds = 0;
                     }
                 }
                 else if (gameObject is Dna)
@@ -192,7 +207,7 @@ namespace Fight_for_The_Life.Domain
 
         public void GenerateRandomGameObject()
         {
-            var number = rand.Next(10);
+            var number = rand.Next(12);
             var y = rand.Next((int)(FieldHeight - 1 - FieldHeight * 0.16));
             var velocity = GetVelocityInPixelsPerSecond();
             if (GameObjects.Count < 3)
@@ -203,19 +218,28 @@ namespace Fight_for_The_Life.Domain
                 else if (number == 2 || number == 3)
                     GameObjects.Add(new Blood(y, velocity));
 
-                else if (GameObjects.All(e => !(e is OtherSperm) || e.GetLocation().X > Game.FieldWidth / 2)
-                         && (number == 4 || number == 5)&& !Sperm.IsShieldActivated)
+                else if (CanOtherSpermSpawn() && (number == 4 || number == 5))
                     GameObjects.Add(new OtherSperm(y, velocity));
 
                 else if (GameObjects.All(e => !(e is IntrauterineDevice)) && (number == 6 || number == 7))
                     GameObjects.Add(new IntrauterineDevice(velocity));
 
-                else if (number == 8)
-                    GameObjects.Add(new Dna(y, velocity));
+                else if (number == 8 || number == 11)
+                    GameObjects.Add(new Dna(y, velocity, Sperm));
 
                 else if (number == 9 && ShieldMaxTimeInSeconds > 0)
                     GameObjects.Add(new Shield(y, velocity));
+
+                else if (number == 10 && MagnetMaxTimeInSeconds > 0)
+                    GameObjects.Add(new Magnet(y, velocity));
             }
+        }
+
+        private bool CanOtherSpermSpawn()
+        {
+            return GameObjects
+                .All(e => !(e is OtherSperm) && 
+                          (!(e is IntrauterineDevice) || e.GetLocation().X > FieldWidth / 2));
         }
     }
 }

@@ -1,11 +1,7 @@
 ﻿using System;
 using Fight_for_The_Life.Domain;
-using System.Collections.Generic;
 using NUnit.Framework;
-using System.Linq;
-using System.Text;
 using System.Drawing;
-using System.Threading;
 using Fight_for_The_Life.Domain.GameObjects;
 
 namespace Tests

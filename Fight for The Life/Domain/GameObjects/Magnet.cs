@@ -1,8 +1,8 @@
 ﻿namespace Fight_for_The_Life.Domain.GameObjects
 {
-    class Shield : GameObject
+    class Magnet : GameObject
     {
-        public Shield(int y, double spermVelocity)
+        public Magnet(int y, double spermVelocity)
         {
             WidthCoefficient = 0.0375;
             HeightCoefficient = 0.0667;

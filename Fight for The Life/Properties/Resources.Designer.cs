@@ -141,6 +141,16 @@ namespace Fight_for_The_Life.Properties {
         }
         
         /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Magnet {
+            get {
+                object obj = ResourceManager.GetObject("Magnet", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Fight for The Life: Natural Selection.
         /// </summary>
         public static string MainForm_MainForm_Fight_for_The_Life__Natural_Selection {
@@ -172,9 +182,29 @@ namespace Fight_for_The_Life.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap MainSpermWithMagnet {
+            get {
+                object obj = ResourceManager.GetObject("MainSpermWithMagnet", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap MainSpermWithShield {
             get {
                 object obj = ResourceManager.GetObject("MainSpermWithShield", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap MainSpermWithShieldAndMagnet {
+            get {
+                object obj = ResourceManager.GetObject("MainSpermWithShieldAndMagnet", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
