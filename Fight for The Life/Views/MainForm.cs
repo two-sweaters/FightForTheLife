@@ -20,7 +20,7 @@ namespace Fight_for_The_Life.Views
         private double widthCoefficient;
         private double heightCoefficient;
 
-        private string saveData => "HighestScore " + game.HighestScore +
+        private string SaveData => "HighestScore " + game.HighestScore +
                                    "\nDnaAmount " + game.DnaAmount +
                                    "\nScoreCoefficient " + game.ScoreCoefficient +
                                    "\nShieldMaxTime " + game.ShieldMaxTimeInSeconds +
@@ -304,7 +304,7 @@ namespace Fight_for_The_Life.Views
 
             File.WriteAllBytes(
                 Path.Combine(Directory.GetCurrentDirectory(), "save.dat"), 
-                Encoding.Unicode.GetBytes(saveData));
+                Encoding.Unicode.GetBytes(SaveData));
             
             AddButton("Esc - выход в меню", 24, Color.White, 0, 5, 
                 AnchorStyles.Left, (sender, args) =>
@@ -322,7 +322,7 @@ namespace Fight_for_The_Life.Views
                     StartGame();
                 });
 
-            AddButton("Game Over", 75, Color.White, 1, 1, AnchorStyles.None);
+            AddButton("Game Over", 60, Color.White, 1, 1, AnchorStyles.None);
 
             onKeyDown = (sender, args) =>
             {
@@ -412,7 +412,7 @@ namespace Fight_for_The_Life.Views
 
                 File.WriteAllBytes(
                     Path.Combine(Directory.GetCurrentDirectory(), "save.dat"),
-                    Encoding.Unicode.GetBytes(saveData));
+                    Encoding.Unicode.GetBytes(SaveData));
 
                 Invalidate();
             }

@@ -4,7 +4,7 @@ namespace Fight_for_The_Life.Domain.GameObjects
 {
     class Dna : GameObject
     {
-        private Sperm sperm;
+        private readonly Sperm sperm;
         public Dna(int y, double spermVelocity, Sperm sperm)
         {
             WidthCoefficient = 0.0375;
