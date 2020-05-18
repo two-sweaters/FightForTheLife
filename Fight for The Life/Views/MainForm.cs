@@ -58,7 +58,7 @@ namespace Fight_for_The_Life.Views
 
         private void CheckSave()
         {
-            var saveData = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
+            var saveData = Resources.save;
             var saveInfo = string.Join("", new string(Encoding.Unicode.GetChars(saveData)));
             var infoArray = saveInfo.Split();
             var highestScore = 0;
@@ -256,9 +256,9 @@ namespace Fight_for_The_Life.Views
             layoutTable.BackColor = Color.FromArgb(128, 0, 0, 0);
 
             File.WriteAllBytes(
-                Path.Combine(Directory.GetCurrentDirectory(), "save.dat"), 
+                Path.Combine(Directory.GetCurrentDirectory(), "save.dat"),
                 Encoding.Unicode.GetBytes(SaveData));
-            
+
             AddButton("Esc - выход в меню", 24, Color.White, 0, 5, 
                 AnchorStyles.Left, (sender, args) =>
                 {

@@ -116,6 +116,7 @@
     <None Include="Resources\MainSpermWithMagnet.png" />
     <None Include="Resources\MainSpermWithShieldAndMagnet.png" />
     <None Include="Resources\Magnet.png" />
+    <None Include="Resources\save.dat" />
     <None Include="Resources\Shop.jpg" />
     <None Include="Resources\MainSpermWithShield.png" />
     <None Include="Resources\Shield.png" />

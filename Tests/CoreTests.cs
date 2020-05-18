@@ -7,116 +7,115 @@ namespace Tests
     [TestFixture]
     class CoreTests
     {
-        private Core core;
-        private Sperm sperm;
+        private Game game;
 
         [SetUp]
         public void SetUp()
         {
-            sperm = new Sperm();
-            core = sperm.Core;
+            game = new Game(0, 0, 1, 0, 0);
         }
 
         [Test]
         public void ShouldBeInsideSperm_AfterCreation()
         {
-            Assert.AreEqual(CoreState.InsideSperm, core.State);
+            Assert.AreEqual(CoreState.InsideSperm, game.Sperm.Core.State);
         }
 
         [Test]
         public void GetModel_ShouldReturnModelInsideSpermModel_AfterCreation()
         {
-            var model = core.GetModel();
-            Assert.True(model.Top > sperm.Model.Top);
-            Assert.True(model.Bottom < sperm.Model.Bottom);
-            Assert.True(model.Left > sperm.Model.Left);
-            Assert.True(model.Right < sperm.Model.Right);
+            var model = game.Sperm.Core.GetModel();
+            Assert.True(model.Top > game.Sperm.Model.Top);
+            Assert.True(model.Bottom < game.Sperm.Model.Bottom);
+            Assert.True(model.Left > game.Sperm.Model.Left);
+            Assert.True(model.Right < game.Sperm.Model.Right);
         }
 
         [Test]
         public void GetModel_ShouldReturnModelInsideSpermModel_AfterMoveUp()
         {
-            sperm.MoveUp();
-            sperm.MoveUp();
-            sperm.MoveUp();
-            var model = core.GetModel();
-            Assert.True(model.Top > sperm.Model.Top);
-            Assert.True(model.Bottom < sperm.Model.Bottom);
-            Assert.True(model.Left > sperm.Model.Left);
-            Assert.True(model.Right < sperm.Model.Right);
+            game.Sperm.MoveUp();
+            game.Sperm.MoveUp();
+            game.Sperm.MoveUp();
+            var model = game.Sperm.Core.GetModel();
+            Assert.True(model.Top > game.Sperm.Model.Top);
+            Assert.True(model.Bottom < game.Sperm.Model.Bottom);
+            Assert.True(model.Left > game.Sperm.Model.Left);
+            Assert.True(model.Right < game.Sperm.Model.Right);
         }
 
         [Test]
         public void Shot_ShouldChangeCoreState_IfCoreInsideSperm()
         {
-            core.Shot(0);
-            Assert.AreEqual(CoreState.Flying, core.State);
+            game.Sperm.Core.Shot(0);
+            Assert.AreEqual(CoreState.Flying, game.Sperm.Core.State);
         }
 
         [Test]
         public void Shot_ShouldNotChangeCoreState_IfCoreIsNotInsideSperm()
         {
-            core.Shot(0);
-            core.Stop( 0);
-            Assert.AreEqual(CoreState.Stopped, core.State);
+            game.Sperm.Core.Shot(0);
+            game.Sperm.Core.Stop( 0);
+            Assert.AreEqual(CoreState.Stopped, game.Sperm.Core.State);
         }
 
         [Test]
         public void ShotPosition_ShouldBeEqualCorePosition_AfterShot()
         {
-            core.Shot(0);
-            Assert.AreEqual(core.GetModel().Location, core.ShotPosition);
+            game.Sperm.Core.Shot(0);
+            Assert.AreEqual(game.Sperm.Core.GetModel().Location, game.Sperm.Core.ShotPosition);
         }
 
         [Test]
         public void GetModel_ShouldCalculateRightLocation_AfterShot()
         {
-            core.Shot(10);
-            Assert.AreEqual(new Point(core.ShotPosition.X + 300, core.ShotPosition.Y),
-                core.GetModel().Location);
+            game.Sperm.Core.Shot(10);
+            game.IncreaseGameTimeInSeconds(10);
+            Assert.AreEqual(new Point(game.Sperm.Core.ShotPosition.X + 300, game.Sperm.Core.ShotPosition.Y),
+                game.Sperm.Core.GetModel().Location);
         }
 
         [Test]
         public void Stop_ShouldChangeCoreState()
         {
-            core.Shot(0);
-            core.Stop( 0);
-            Assert.AreEqual(CoreState.Stopped, core.State);
+            game.Sperm.Core.Shot(0);
+            game.Sperm.Core.Stop( 0);
+            Assert.AreEqual(CoreState.Stopped, game.Sperm.Core.State);
         }
 
         [Test]
         public void Stop_ShouldNotChangeCoreState_IfCoreIsNotFlying()
         {
-            core.Stop( 0);
-            Assert.AreEqual(CoreState.InsideSperm, core.State);
+            game.Sperm.Core.Stop( 0);
+            Assert.AreEqual(CoreState.InsideSperm, game.Sperm.Core.State);
         }
 
         [Test]
         public void GetModel_ShouldCalculateRightLocation_AfterStop()
         {
-            core.Shot(10);
-            core.timeAfterShotInSeconds = 10;
-            core.Stop(10);
-            core.flightTimeInSeconds = 15;
-            Assert.AreEqual(new Point(core.ShotPosition.X + 200, core.ShotPosition.Y), 
-                core.GetModel().Location);
+            game.Sperm.Core.Shot(10);
+            game.IncreaseGameTimeInSeconds(10);
+            game.Sperm.Core.Stop(10);
+            game.IncreaseGameTimeInSeconds(15);
+            Assert.AreEqual(new Point(game.Sperm.Core.ShotPosition.X + 150, game.Sperm.Core.ShotPosition.Y),
+                game.Sperm.Core.GetModel().Location);
         }
 
         [Test]
         public void PickUp_ShouldChangeCoreState_IfCoreIsStopped()
         {
-            core.Shot(0);
-            core.Stop(0);
-            core.PickUp();
-            Assert.AreEqual(CoreState.InsideSperm, core.State);
+            game.Sperm.Core.Shot(0);
+            game.Sperm.Core.Stop(0);
+            game.Sperm.Core.PickUp();
+            Assert.AreEqual(CoreState.InsideSperm, game.Sperm.Core.State);
         }
 
         [Test]
         public void PickUp_ShouldNotChangeCoreState_IfCoreIsFlying()
         {
-            core.Shot(0);
-            core.PickUp();
-            Assert.AreEqual(CoreState.Flying, core.State);
+            game.Sperm.Core.Shot(0);
+            game.Sperm.Core.PickUp();
+            Assert.AreEqual(CoreState.Flying, game.Sperm.Core.State);
         }
     }
 }

@@ -28,10 +28,10 @@ namespace Fight_for_The_Life.Domain
             }
         }
 
-        private double gameTimeInSeconds;
-        private double shieldTimeInSeconds;
-        private double magnetTimeInSeconds;
-        private double emptyFieldTime;
+        public double gameTimeInSeconds { get; private set; }
+        public double shieldTimeInSeconds { get; private set; }
+        public double magnetTimeInSeconds { get; private set; }
+        public double emptyFieldTime { get; private set; }
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private const double AccelerationCoefficient = 1.25;
         public readonly Sperm Sperm = new Sperm();

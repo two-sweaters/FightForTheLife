@@ -2,7 +2,7 @@
 
 namespace Fight_for_The_Life.Domain.GameObjects
 {
-    class Dna : GameObject
+    public class Dna : GameObject
     {
         private readonly Sperm sperm;
         public Dna(int y, double spermVelocity, Sperm sperm)

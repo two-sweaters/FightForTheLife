@@ -1,6 +1,6 @@
 ﻿namespace Fight_for_The_Life.Domain.GameObjects
 {
-    class Magnet : GameObject
+    public class Magnet : GameObject
     {
         public Magnet(int y, double spermVelocity)
         {

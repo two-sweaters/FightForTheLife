@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoreTests.cs" />
+    <Compile Include="DnaTests.cs" />
     <Compile Include="GameTests.cs" />
     <Compile Include="SpermTests.cs" />
     <Compile Include="BloodTests.cs" />

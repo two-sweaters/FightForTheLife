@@ -1,6 +1,6 @@
 ﻿namespace Fight_for_The_Life.Domain.GameObjects
 {
-    class Shield : GameObject
+    public class Shield : GameObject
     {
         public Shield(int y, double spermVelocity)
         {
