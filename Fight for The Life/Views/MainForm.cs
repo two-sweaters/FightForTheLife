@@ -58,7 +58,7 @@ namespace Fight_for_The_Life.Views
 
         private void CheckSave()
         {
-            var saveData = Resources.save;
+            var saveData = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
             var saveInfo = string.Join("", new string(Encoding.Unicode.GetChars(saveData)));
             var infoArray = saveInfo.Split();
             var highestScore = 0;
