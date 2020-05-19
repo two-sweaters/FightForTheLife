@@ -44,8 +44,25 @@ namespace Fight_for_The_Life.Domain
         public int DnaAmount { get; set; }
         public int HighestScore { get; private set; }
         public int ScoreCoefficientCost => (int)(ScoreCoefficient / 0.5 - 2) * 5 + 25;
-        public int ShieldMaxTimeCost => ShieldMaxTimeInSeconds / 5 * 5 + 25;
-        public int MagnetMaxTimeCost => MagnetMaxTimeInSeconds / 5 * 5 + 25;
+        public int ShieldMaxTimeCost
+        {
+            get
+            {
+                if (ShieldMaxTimeInSeconds == 0)
+                    return 1;
+                return ShieldMaxTimeInSeconds / 5 * 5 + 25;
+            }
+        }
+
+        public int MagnetMaxTimeCost
+        {
+            get
+            {
+                if (MagnetMaxTimeInSeconds == 0)
+                    return 1;
+                return MagnetMaxTimeInSeconds / 5 * 5 + 25;
+            }
+        }
 
         public Game(int dnaAmount, int highestScore, double scoreCoefficient, 
             int shieldMaxTimeInSeconds, int magnetMaxTimeInSeconds)
@@ -205,7 +222,7 @@ namespace Fight_for_The_Life.Domain
             }
         }
 
-        public void GenerateRandomGameObject()
+        private void GenerateRandomGameObject()
         {
             var number = rand.Next(100);
             var y = rand.Next((int)(FieldHeight - 1 - FieldHeight * 0.16));

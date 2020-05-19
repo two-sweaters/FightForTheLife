@@ -15,6 +15,7 @@ namespace Fight_for_The_Life.Views
         private Game game;
         private KeyEventHandler onKeyDown;
         private PaintEventHandler gameDrawing;
+        private PaintEventHandler interfaceDrawing;
         private GameImages images;
         private double widthCoefficient;
         private double heightCoefficient;
@@ -90,29 +91,36 @@ namespace Fight_for_The_Life.Views
             widthCoefficient = Width / 1920d;
             heightCoefficient = Height / 1080d;
             images = new GameImages(widthCoefficient, heightCoefficient);
-            var font = new Font("Segoe Print", (int)(70 * Width / 1920d),
+            var font = new Font("Segoe Print", (int)(70 * widthCoefficient),
                 FontStyle.Bold, GraphicsUnit.World);
 
             layoutTable.Controls.Clear();
             layoutTable.BackColor = Color.Transparent;
             BackgroundImage = Resources.MainMenuBackground;
 
+            Paint -= interfaceDrawing;
             Paint -= gameDrawing;
-            gameDrawing = (sender, args) =>
+            interfaceDrawing = (sender, args) =>
             {
                 args.Graphics.DrawImage(images.Dna, new Point(20, 20));
                 args.Graphics.DrawString(game.DnaAmount.ToString(), font, Brushes.White, 20 + images.Dna.Width, 5);
             };
-            Paint += gameDrawing;
+            Paint += interfaceDrawing;
 
             AddButton("- Выход -", 24, Color.White, 1, 5, 
                 AnchorStyles.None, (sender, args) => Application.Exit());
-            AddButton("Играть", 54, Color.Black, 0, 4, 
-                AnchorStyles.Right, (sender, args) => ControlMenuInitialization());
             AddButton("Противники", 54, Color.Black, 2, 4,
                 AnchorStyles.Left, (sender, args) => EnemiesFirstPageInitialization());
             AddButton("Магазин", 40, Color.White, 2, 0, 
                 AnchorStyles.Right, (sender, args) => ShopInitialization());
+            AddButton("Играть", 54, Color.Black, 0, 4,
+                AnchorStyles.Right, (sender, args) =>
+                {
+                    if (game.HighestScore == 0)
+                        TutorialInitialization();
+                    else
+                        ControlMenuInitialization();
+                });
 
             Invalidate();
         }
@@ -123,8 +131,11 @@ namespace Fight_for_The_Life.Views
             BackgroundImage = Resources.Shop;
             var font = new Font("Segoe Print", (int)(40 * widthCoefficient),
                 FontStyle.Bold, GraphicsUnit.World);
+            var dnaFont = new Font("Segoe Print", (int)(70 * widthCoefficient),
+                FontStyle.Bold, GraphicsUnit.World);
 
-            gameDrawing = (sender, args) =>
+            Paint -= interfaceDrawing;
+            interfaceDrawing = (sender, args) =>
             {
                 args.Graphics.DrawImage(images.Dna, Width / 3 * 2, Height / 6 * 1 + Height / 24);
                 args.Graphics.DrawString(game.MagnetMaxTimeCost.ToString(), font, Brushes.Black,
@@ -137,8 +148,11 @@ namespace Fight_for_The_Life.Views
                 args.Graphics.DrawImage(images.Dna, Width / 3 * 2, Height / 6 * 3 + Height / 24);
                 args.Graphics.DrawString(game.ScoreCoefficientCost.ToString(), font, Brushes.Black,
                     Width / 3 * 2 + images.Dna.Width, Height / 6 * 3 + Height / 24);
+
+                args.Graphics.DrawImage(images.Dna, new Point(20, 20));
+                args.Graphics.DrawString(game.DnaAmount.ToString(), dnaFont, Brushes.White, 20 + images.Dna.Width, 5);
             };
-            Paint += gameDrawing;
+            Paint += interfaceDrawing;
         }
 
         private void EnemiesFirstPageInitialization()
@@ -172,6 +186,15 @@ namespace Fight_for_The_Life.Views
                 AnchorStyles.None, (sender, args) => StartGame());
         }
 
+        private void TutorialInitialization()
+        {
+            layoutTable.Controls.Clear();
+            BackgroundImage = Resources.Tutorial;
+
+            AddButton("- Управление -", 24, Color.White, 1, 5,
+                AnchorStyles.None, (sender, args) => ControlMenuInitialization());
+        }
+
         private void StartGame()
         {
             layoutTable.Controls.Clear();
@@ -183,7 +206,7 @@ namespace Fight_for_The_Life.Views
             CheckSave();
             timer.Start();
 
-            Paint -= gameDrawing;
+            Paint -= interfaceDrawing;
             gameDrawing = (sender, args) =>
             {
                 var scoreText = "Score: " + game.GetScore();
@@ -231,7 +254,7 @@ namespace Fight_for_The_Life.Views
             }
             else
             {
-                args.Graphics.DrawImage(images.Sperm, 
+                args.Graphics.DrawImage(images.Sperm,
                     game.Sperm.Model.Width - images.Sperm.Width,
                     game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
             }
@@ -258,6 +281,13 @@ namespace Fight_for_The_Life.Views
             File.WriteAllBytes(
                 Path.Combine(Directory.GetCurrentDirectory(), "save.dat"),
                 Encoding.Unicode.GetBytes(SaveData));
+
+            if (game.MagnetMaxTimeInSeconds == 0 && game.ShieldMaxTimeInSeconds == 0
+                                                 && game.DnaAmount >= game.ShieldMaxTimeCost)
+            {
+                FirstBuyInitialization();
+                return;
+            }
 
             AddButton("Esc - выход в меню", 24, Color.White, 0, 5, 
                 AnchorStyles.Left, (sender, args) =>
@@ -294,6 +324,28 @@ namespace Fight_for_The_Life.Views
                 }
             };
             KeyDown += onKeyDown;
+        }
+
+        private void FirstBuyInitialization()
+        {
+            layoutTable.BackColor = Color.Transparent;
+            layoutTable.Controls.Clear();
+
+            interfaceDrawing = (sender, args) =>
+            {
+                args.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(128, 0, 0, 0)), 0, 0, Width, Height);
+                args.Graphics.DrawImage(Resources.FirstBuy, (Width  - Resources.FirstBuy.Width) / 2,
+                    (Height - Resources.FirstBuy.Height) / 2, Resources.FirstBuy.Width, Resources.FirstBuy.Height);
+            };
+            Paint += interfaceDrawing;
+
+            AddButton("В магазин!", 60, Color.White, 1, 4, 
+                AnchorStyles.None, (sender, args) =>
+                {
+                    Paint -= gameDrawing;
+                    Paint -= interfaceDrawing;
+                    ShopInitialization();
+                });
         }
 
         private void PauseGame()
@@ -344,7 +396,8 @@ namespace Fight_for_The_Life.Views
                 ForeColor = color,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Dock = DockStyle.None,
-                Font = new Font("Segoe Print",(int) (size * widthCoefficient), FontStyle.Bold, GraphicsUnit.World)
+                Font = new Font("Segoe Print", (int) (size * widthCoefficient), 
+                    FontStyle.Bold, GraphicsUnit.World)
             };
             button.Click += actionOnClick;
             layoutTable.Controls.Add(button, column, row);
