@@ -465,11 +465,11 @@ namespace Fight_for_The_Life.Views
                 40, Color.Black, 1, 1, AnchorStyles.Left,
                 (sender, args) => TryBuy(game.MagnetMaxTimeCost, ItemToBuy.MagnetMaxTime));
 
-            AddButton("Щит +5с\n(тек. " + game.ShieldMaxTimeInSeconds + ")",
+            AddButton("Щит + 5с\n(тек. " + game.ShieldMaxTimeInSeconds + ")",
                 40, Color.Black, 1, 2, AnchorStyles.Left,
                 (sender, args) => TryBuy(game.ShieldMaxTimeCost, ItemToBuy.ShieldMaxTime));
 
-            AddButton("Множитель очков +0.5\n(тек. x" + game.ScoreCoefficient + ")",
+            AddButton("Множитель очков + 0.5\n(тек. x" + game.ScoreCoefficient + ")",
                 40, Color.Black, 1, 3, AnchorStyles.Left,
                 (sender, args) => TryBuy(game.ScoreCoefficientCost, ItemToBuy.ScoreCoefficient));
         }
