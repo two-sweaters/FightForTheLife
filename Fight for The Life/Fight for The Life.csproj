@@ -134,6 +134,9 @@
     <None Include="Resources\Core.png" />
     <None Include="Resources\Blood.png" />
     <None Include="Resources\Dna.png" />
+    <Content Include="Soundtrack.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\EnemiesSecond.jpg" />
     <None Include="Resources\FirstEnemies.png" />
   </ItemGroup>

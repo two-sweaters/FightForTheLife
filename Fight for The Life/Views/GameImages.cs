@@ -14,13 +14,13 @@ namespace Fight_for_The_Life.Views
         public readonly Bitmap SpermWithMagnet;
         public readonly Bitmap SpermWithShieldAndMagnet;
         public readonly Bitmap Core;
-        private readonly Bitmap Blood;
-        private readonly Bitmap BirthControl;
-        private readonly Bitmap IntrauterineDevice; 
-        private readonly Bitmap OtherSperm;
+        public readonly Bitmap Blood;
+        public readonly Bitmap BirthControl;
+        public readonly Bitmap IntrauterineDevice; 
+        public readonly Bitmap OtherSperm;
         public readonly Bitmap Dna;
-        private readonly Bitmap Shield;
-        private readonly Bitmap Magnet;
+        public readonly Bitmap Shield;
+        public readonly Bitmap Magnet;
         public readonly Dictionary<Type, Bitmap> GameObjectsImages = new Dictionary<Type, Bitmap>();
 
         public GameImages(double widthCoefficient, double heightCoefficient)
