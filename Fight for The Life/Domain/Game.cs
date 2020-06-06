@@ -49,7 +49,7 @@ namespace Fight_for_The_Life.Domain
             get
             {
                 if (ShieldMaxTimeInSeconds == 0)
-                    return 1;
+                    return 5;
                 return ShieldMaxTimeInSeconds / 5 * 5 + 25;
             }
         }
@@ -59,7 +59,7 @@ namespace Fight_for_The_Life.Domain
             get
             {
                 if (MagnetMaxTimeInSeconds == 0)
-                    return 1;
+                    return 5;
                 return MagnetMaxTimeInSeconds / 5 * 5 + 25;
             }
         }

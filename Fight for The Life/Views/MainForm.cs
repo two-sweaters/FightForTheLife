@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Media;
@@ -12,9 +13,10 @@ namespace Fight_for_The_Life.Views
     public partial class MainForm : Form
     {
         private readonly TableLayoutPanel layoutTable = new TableLayoutPanel();
+        private readonly HashSet<Keys> pressedKeys = new HashSet<Keys>();
         private readonly SoundPlayer player = new SoundPlayer(
                 Path.Combine(Directory.GetCurrentDirectory(), "Soundtrack.wav"));
-        private readonly Timer timer = new Timer { Interval = 50 };
+        private Timer timer = new Timer { Interval = 50 };
         private Game game;
         private KeyEventHandler onKeyDown;
         private PaintEventHandler gameDrawing;
@@ -23,6 +25,7 @@ namespace Fight_for_The_Life.Views
         private double widthCoefficient;
         private double heightCoefficient;
         private bool isMusicPlaying = true;
+        private bool isGamePlaying;
 
         private string SaveData => "HighestScore " + game.HighestScore +
                                    "\nDnaAmount " + game.DnaAmount +
@@ -54,8 +57,13 @@ namespace Fight_for_The_Life.Views
                 game.UpdateGame();
                 if (game.IsGameOver)
                     GameOver();
+                if (isGamePlaying)
+                    HandleControlInGame();
                 Invalidate();
             };
+
+            KeyDown += (sender, args) => pressedKeys.Add(args.KeyCode);
+            KeyUp += (sender, args) => pressedKeys.Remove(args.KeyCode);
 
             player.PlayLooping();
 
@@ -65,7 +73,17 @@ namespace Fight_for_The_Life.Views
 
         private void CheckSave()
         {
-            var saveData = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
+            byte[] saveData;
+            try
+            {
+                saveData = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
+            }
+            catch (Exception)
+            {
+                File.Create(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
+                saveData = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "save.dat"));
+            }
+
             var saveInfo = string.Join("", new string(Encoding.Unicode.GetChars(saveData)));
             var infoArray = saveInfo.Split();
             var highestScore = 0;
@@ -118,7 +136,7 @@ namespace Fight_for_The_Life.Views
                 AnchorStyles.None, (sender, args) => Application.Exit());
             AddButton("Противники", 54, Color.Black, 2, 4,
                 AnchorStyles.Left, (sender, args) => EnemiesFirstPageInitialization());
-            AddButton("Магазин", 40, Color.White, 2, 0,
+            AddButton("Магазин", 24, Color.White, 2, 5,
                 AnchorStyles.Right, (sender, args) => ShopInitialization());
             AddButton("Играть", 54, Color.Black, 0, 4,
                 AnchorStyles.Right, (sender, args) =>
@@ -128,7 +146,7 @@ namespace Fight_for_The_Life.Views
                     else
                         ControlMenuInitialization();
                 });
-            AddButton("Музыка: вкл.", 40, Color.White, 0, 5,
+            AddButton("Музыка: вкл.", 24, Color.White, 0, 5,
                 AnchorStyles.Left, (sender, args) => ManageMusic(sender));
 
             Invalidate();
@@ -186,7 +204,7 @@ namespace Fight_for_The_Life.Views
             layoutTable.Controls.Clear();
             BackgroundImage = Resources.FirstEnemies;
 
-            AddButton("- Выход -", 24, Color.White, 0, 5,
+            AddButton("- В меню -", 24, Color.White, 0, 5,
                 AnchorStyles.Left, (sender, args) => MainMenuInitialization());
             AddButton("Следующая страница ->", 24, Color.White, 2, 5,
                 AnchorStyles.Right, (sender, args) => EnemiesSecondPageInitialization());
@@ -197,7 +215,7 @@ namespace Fight_for_The_Life.Views
             layoutTable.Controls.Clear();
             BackgroundImage = Resources.EnemiesSecond;
 
-            AddButton("- Выход -", 24, Color.White, 2, 5,
+            AddButton("- В меню -", 24, Color.White, 2, 5,
                 AnchorStyles.Right, (sender, args) => MainMenuInitialization());
             AddButton("<- Предыдущая страница", 24, Color.White, 0, 5,
                 AnchorStyles.Left, (sender, args) => EnemiesFirstPageInitialization());
@@ -208,8 +226,11 @@ namespace Fight_for_The_Life.Views
             layoutTable.Controls.Clear();
             BackgroundImage = Resources.Control;
 
-            AddButton("- К игре -", 24, Color.White, 1, 5,
+            AddButton("- Нажмите на любую кнопку для начала игры -", 24, Color.White, 1, 5,
                 AnchorStyles.None, (sender, args) => StartGame());
+
+            onKeyDown = (sender, args) => StartGame();
+            KeyDown += onKeyDown;
         }
 
         private void TutorialInitialization()
@@ -223,6 +244,7 @@ namespace Fight_for_The_Life.Views
 
         private void StartGame()
         {
+            isGamePlaying = true;
             layoutTable.Controls.Clear();
             layoutTable.BackColor = Color.Transparent;
             BackgroundImage = null;
@@ -253,7 +275,12 @@ namespace Fight_for_The_Life.Views
             };
             Paint += gameDrawing;
 
-            onKeyDown = (sender, args) => ControlInGame(args);
+            KeyDown -= onKeyDown;
+            onKeyDown = (sender, args) =>
+            {
+                if (args.KeyCode == Keys.Escape)
+                    PauseGame();
+            };
             KeyDown += onKeyDown;
         }
 
@@ -305,6 +332,7 @@ namespace Fight_for_The_Life.Views
 
         private void GameOver()
         {
+            isGamePlaying = false;
             timer.Stop();
             KeyDown -= onKeyDown;
             layoutTable.BackColor = Color.FromArgb(170, 0, 0, 0);
@@ -382,6 +410,7 @@ namespace Fight_for_The_Life.Views
 
         private void PauseGame()
         {
+            isGamePlaying = false;
             KeyDown -= onKeyDown;
             onKeyDown = (sender, args) =>
             {
@@ -391,7 +420,8 @@ namespace Fight_for_The_Life.Views
             KeyDown += onKeyDown;
             layoutTable.BackColor = Color.FromArgb(170, 0, 0, 0);
 
-            AddButton("- В меню -", 60, Color.White, 1, 2,
+
+            AddButton("- В меню -", 60, Color.White, 1, 3,
                 AnchorStyles.None, (sender, args) =>
                 {
                     Paint -= gameDrawing;
@@ -399,8 +429,8 @@ namespace Fight_for_The_Life.Views
                     MainMenuInitialization();
                 });
 
-            AddButton("- Выход -", 60, Color.White, 1, 3,
-                AnchorStyles.None, (sender, args) => Application.Exit());
+            AddButton("- К игре -", 60, Color.White, 1, 2,
+                AnchorStyles.None, (sender, args) => ResumeGame());
 
             string musicButtonText;
             if (isMusicPlaying)
@@ -415,10 +445,15 @@ namespace Fight_for_The_Life.Views
 
         private void ResumeGame()
         {
+            isGamePlaying = true;
             layoutTable.Controls.Clear();
             layoutTable.BackColor = Color.Transparent;
             KeyDown -= onKeyDown;
-            onKeyDown = (sender, args) => ControlInGame(args);
+            onKeyDown = (sender, args) =>
+            {
+                if (args.KeyCode == Keys.Escape)
+                    PauseGame();
+            };
             KeyDown += onKeyDown;
             timer.Start();
         }
@@ -465,26 +500,21 @@ namespace Fight_for_The_Life.Views
             }
         }
 
-        private void ControlInGame(KeyEventArgs args)
+        private void HandleControlInGame()
         {
-            if (args.KeyCode == Keys.Up)
+            if (pressedKeys.Contains(Keys.Up))
             {
                 game.Sperm.MoveUp();
             }
 
-            if (args.KeyCode == Keys.Down)
+            if (pressedKeys.Contains(Keys.Down))
             {
                 game.Sperm.MoveDown();
             }
 
-            if (args.KeyCode == Keys.Space)
+            if (pressedKeys.Contains(Keys.Space))
             {
                 game.Sperm.Core.Shot(game.GetVelocityInPixelsPerSecond());
-            }
-
-            if (args.KeyCode == Keys.Escape)
-            {
-                PauseGame();
             }
         }
 
@@ -492,7 +522,7 @@ namespace Fight_for_The_Life.Views
         {
             layoutTable.Controls.Clear();
 
-            AddButton("- Выход -", 24, Color.White, 0, 5,
+            AddButton("- В меню -", 24, Color.White, 0, 5,
                 AnchorStyles.Left, (sender, args) => MainMenuInitialization());
 
             AddButton("Магнит + 5с\n(тек. " + game.MagnetMaxTimeInSeconds + ")",

@@ -2,7 +2,7 @@
 
 namespace Fight_for_The_Life.Domain.GameObjects
 {
-    public class GameObject
+    public abstract class GameObject
     {
         protected int Y;
         protected double Velocity;
