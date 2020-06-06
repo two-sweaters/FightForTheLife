@@ -16,7 +16,7 @@ namespace Fight_for_The_Life.Views
         private readonly HashSet<Keys> pressedKeys = new HashSet<Keys>();
         private readonly SoundPlayer player = new SoundPlayer(
                 Path.Combine(Directory.GetCurrentDirectory(), "Soundtrack.wav"));
-        private Timer timer = new Timer { Interval = 50 };
+        private Timer timer = new Timer { Interval = 33 };
         private Game game;
         private KeyEventHandler onKeyDown;
         private PaintEventHandler gameDrawing;
@@ -53,7 +53,7 @@ namespace Fight_for_The_Life.Views
 
             timer.Tick += (sender, args) =>
             {
-                game.IncreaseGameTimeInSeconds(50 / 1000d);
+                game.IncreaseGameTimeInSeconds(timer.Interval / 1000d);
                 game.UpdateGame();
                 if (game.IsGameOver)
                     GameOver();
