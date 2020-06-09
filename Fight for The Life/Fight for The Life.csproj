@@ -134,6 +134,11 @@
     <None Include="Resources\Core.png" />
     <None Include="Resources\Blood.png" />
     <None Include="Resources\Dna.png" />
+    <None Include="Resources\FiveLives.png" />
+    <None Include="Resources\FourLives.png" />
+    <None Include="Resources\ThreeLives.png" />
+    <None Include="Resources\TwoLives.png" />
+    <None Include="Resources\OneLife.png" />
     <Content Include="Soundtrack.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

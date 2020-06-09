@@ -16,7 +16,9 @@ namespace Fight_for_The_Life.Views
         private readonly HashSet<Keys> pressedKeys = new HashSet<Keys>();
         private readonly SoundPlayer player = new SoundPlayer(
                 Path.Combine(Directory.GetCurrentDirectory(), "Soundtrack.wav"));
-        private Timer timer = new Timer { Interval = 33 };
+        private readonly Timer timer = new Timer { Interval = 33 };
+        private int animationTimeCount;
+        private readonly Timer animationTimer = new Timer { Interval = 125, Enabled = true };
         private Game game;
         private KeyEventHandler onKeyDown;
         private PaintEventHandler gameDrawing;
@@ -31,7 +33,8 @@ namespace Fight_for_The_Life.Views
                                    "\nDnaAmount " + game.DnaAmount +
                                    "\nScoreCoefficient " + game.ScoreCoefficient +
                                    "\nShieldMaxTime " + game.ShieldMaxTimeInSeconds +
-                                   "\nMagnetMaxTime " + game.MagnetMaxTimeInSeconds;
+                                   "\nMagnetMaxTime " + game.MagnetMaxTimeInSeconds +
+                                   "\nExtraLifeAmount " + game.ExtraLifeAmount;
 
         public MainForm()
         {
@@ -61,8 +64,13 @@ namespace Fight_for_The_Life.Views
                     HandleControlInGame();
                 Invalidate();
             };
+            animationTimer.Tick += (sender, args) => animationTimeCount += animationTimer.Interval;
 
-            KeyDown += (sender, args) => pressedKeys.Add(args.KeyCode);
+            KeyDown += (sender, args) =>
+            {
+                if (args.KeyCode == Keys.Up || args.KeyCode == Keys.Down)
+                    pressedKeys.Add(args.KeyCode);
+            };
             KeyUp += (sender, args) => pressedKeys.Remove(args.KeyCode);
 
             player.PlayLooping();
@@ -90,6 +98,7 @@ namespace Fight_for_The_Life.Views
             var dnaAmount = 0;
             var shieldMaxTime = 0;
             var magnetMaxTime = 0;
+            var extraLifeAmount = 0;
             var scoreCoefficient = 1.0;
 
             if (infoArray.Length >= 2)
@@ -107,7 +116,10 @@ namespace Fight_for_The_Life.Views
             if (infoArray.Length >= 10)
                 magnetMaxTime = int.Parse(infoArray[9]);
 
-            game = new Game(dnaAmount, highestScore, scoreCoefficient, shieldMaxTime, magnetMaxTime);
+            if (infoArray.Length >= 12)
+                extraLifeAmount = int.Parse(infoArray[11]);
+
+            game = new Game(dnaAmount, highestScore, scoreCoefficient, shieldMaxTime, magnetMaxTime, extraLifeAmount);
         }
 
         private void MainMenuInitialization()
@@ -133,7 +145,11 @@ namespace Fight_for_The_Life.Views
             Paint += interfaceDrawing;
 
             AddButton("- Выход -", 24, Color.White, 1, 5,
-                AnchorStyles.None, (sender, args) => Application.Exit());
+                AnchorStyles.None, (sender, args) =>
+                {
+                    Save();
+                    Application.Exit();
+                });
             AddButton("Противники", 54, Color.Black, 2, 4,
                 AnchorStyles.Left, (sender, args) => EnemiesFirstPageInitialization());
             AddButton("Магазин", 24, Color.White, 2, 5,
@@ -146,8 +162,7 @@ namespace Fight_for_The_Life.Views
                     else
                         ControlMenuInitialization();
                 });
-            AddButton("Музыка: вкл.", 24, Color.White, 0, 5,
-                AnchorStyles.Left, (sender, args) => ManageMusic(sender));
+            AddMusicButton(24);
 
             Invalidate();
         }
@@ -193,6 +208,10 @@ namespace Fight_for_The_Life.Views
                 args.Graphics.DrawString(game.ScoreCoefficientCost.ToString(), font, Brushes.Black,
                     Width / 3 * 2 + images.Dna.Width, Height / 6 * 3 + Height / 24);
 
+                args.Graphics.DrawImage(images.Dna, Width / 3 * 2, Height / 6 * 4 + Height / 24);
+                args.Graphics.DrawString(Game.ExtraLifeCost.ToString(), font, Brushes.Black,
+                    Width / 3 * 2 + images.Dna.Width, Height / 6 * 4 + Height / 24);
+
                 args.Graphics.DrawImage(images.Dna, new Point(20, 20));
                 args.Graphics.DrawString(game.DnaAmount.ToString(), dnaFont, Brushes.White, 20 + images.Dna.Width, 5);
             };
@@ -223,10 +242,13 @@ namespace Fight_for_The_Life.Views
 
         private void ControlMenuInitialization()
         {
+            widthCoefficient = Width / 1920d;
+            heightCoefficient = Height / 1080d;
+            images = new GameImages(widthCoefficient, heightCoefficient);
             layoutTable.Controls.Clear();
             BackgroundImage = Resources.Control;
 
-            AddButton("- Нажмите на любую кнопку для начала игры -", 24, Color.White, 1, 5,
+            AddButton("Нажмите на любую кнопку для начала игры", 24, Color.White, 1, 5,
                 AnchorStyles.None, (sender, args) => StartGame());
 
             onKeyDown = (sender, args) => StartGame();
@@ -266,9 +288,24 @@ namespace Fight_for_The_Life.Views
                 args.Graphics.DrawImage(images.Background, 0, 0);
                 args.Graphics.DrawString(scoreText, font, new SolidBrush(Color.White), 0, 0);
                 args.Graphics.DrawString(highestText, font, Brushes.White, (float)(1050 * widthCoefficient), 0);
-                args.Graphics.DrawImage(images.Dna, new Point(20, Height - 20 - images.Dna.Height));
+                args.Graphics.DrawImage(images.Dna, 20, Height - 20 - images.Dna.Height);
                 args.Graphics.DrawString(game.DnaAmount.ToString(), dnaFont, Brushes.White, 20 + images.Dna.Width,
                     Height - 30 - images.Dna.Height);
+                if (game.ExtraLifeAmount == 1)
+                    args.Graphics.DrawImage(images.OneLife, Width * 5 / 6 - images.OneLife.Width / 2,
+                        Height - images.OneLife.Height * 2);
+                if (game.ExtraLifeAmount == 2)
+                    args.Graphics.DrawImage(images.TwoLives, Width * 5 / 6 - images.OneLife.Width / 2,
+                        Height - images.OneLife.Height * 2);
+                if (game.ExtraLifeAmount == 3)
+                    args.Graphics.DrawImage(images.ThreeLives, Width * 5 / 6 - images.OneLife.Width / 2,
+                        Height - images.OneLife.Height * 2);
+                if (game.ExtraLifeAmount == 4)
+                    args.Graphics.DrawImage(images.FourLives, Width * 5 / 6 - images.OneLife.Width / 2,
+                        Height - images.OneLife.Height * 2);
+                if (game.ExtraLifeAmount == 5)
+                    args.Graphics.DrawImage(images.FiveLives, Width * 5 / 6 - images.OneLife.Width / 2,
+                        Height - images.OneLife.Height * 2);
 
                 DrawSpermAndCore(args, indent);
                 DrawGameObjects(args, indent);
@@ -280,6 +317,8 @@ namespace Fight_for_The_Life.Views
             {
                 if (args.KeyCode == Keys.Escape)
                     PauseGame();
+                if (args.KeyCode == Keys.Space)
+                    game.Sperm.Core.Shot(game.GetVelocityInPixelsPerSecond());
             };
             KeyDown += onKeyDown;
         }
@@ -288,33 +327,45 @@ namespace Fight_for_The_Life.Views
         {
             var coreModel = game.Sperm.Core.GetModel();
 
-            args.Graphics.DrawImage(images.Core,
-                coreModel.X + coreModel.Width - images.Core.Width,
-                coreModel.Location.Y - (images.Core.Height - coreModel.Height) / 2 + indent);
-
-            if (game.Sperm.IsShieldActivated && game.Sperm.IsMagnetActivated)
+            if (!game.Sperm.IsInvulnerable || animationTimeCount % 250 == 0)
             {
-                args.Graphics.DrawImage(images.SpermWithShieldAndMagnet,
-                    game.Sperm.Model.Width - images.Sperm.Width,
-                    game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
-            }
-            else if (game.Sperm.IsMagnetActivated)
-            {
-                args.Graphics.DrawImage(images.SpermWithMagnet,
-                    game.Sperm.Model.Width - images.Sperm.Width,
-                    game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
-            }
-            else if (game.Sperm.IsShieldActivated)
-            {
-                args.Graphics.DrawImage(images.SpermWithShield,
-                    game.Sperm.Model.Width - images.Sperm.Width,
-                    game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
-            }
-            else
-            {
-                args.Graphics.DrawImage(images.Sperm,
-                    game.Sperm.Model.Width - images.Sperm.Width,
-                    game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
+                args.Graphics.DrawImage(images.Core,
+                    coreModel.X + coreModel.Width - images.Core.Width,
+                    coreModel.Location.Y - (images.Core.Height - coreModel.Height) / 2 + indent);
+                if (game.Sperm.IsShieldActivated && game.Sperm.IsMagnetActivated)
+                {
+                    if (game.ShieldMaxTimeInSeconds - game.ShieldTimeInSeconds > 1 || animationTimeCount % 250 == 0)
+                        args.Graphics.DrawImage(images.SpermWithShieldAndMagnet,
+                            game.Sperm.Model.Width - images.Sperm.Width,
+                            game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
+                    else
+                        args.Graphics.DrawImage(images.SpermWithMagnet,
+                            game.Sperm.Model.Width - images.Sperm.Width,
+                            game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
+                }
+                else if (game.Sperm.IsMagnetActivated)
+                {
+                    args.Graphics.DrawImage(images.SpermWithMagnet,
+                        game.Sperm.Model.Width - images.Sperm.Width,
+                        game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
+                }
+                else if (game.Sperm.IsShieldActivated)
+                {
+                    if (game.ShieldMaxTimeInSeconds - game.ShieldTimeInSeconds > 1 || animationTimeCount % 250 == 0)
+                        args.Graphics.DrawImage(images.SpermWithShield,
+                            game.Sperm.Model.Width - images.Sperm.Width,
+                            game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
+                    else
+                        args.Graphics.DrawImage(images.Sperm,
+                            game.Sperm.Model.Width - images.Sperm.Width,
+                            game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
+                }
+                else
+                {
+                    args.Graphics.DrawImage(images.Sperm,
+                        game.Sperm.Model.Width - images.Sperm.Width,
+                        game.Sperm.Location.Y - (images.Sperm.Height - game.Sperm.Model.Height) / 2 + indent);
+                }
             }
         }
 
@@ -337,9 +388,7 @@ namespace Fight_for_The_Life.Views
             KeyDown -= onKeyDown;
             layoutTable.BackColor = Color.FromArgb(170, 0, 0, 0);
 
-            File.WriteAllBytes(
-                Path.Combine(Directory.GetCurrentDirectory(), "save.dat"),
-                Encoding.Unicode.GetBytes(SaveData));
+            Save();
 
             if (game.MagnetMaxTimeInSeconds == 0 && game.ShieldMaxTimeInSeconds == 0
                                                  && game.DnaAmount >= game.ShieldMaxTimeCost)
@@ -432,13 +481,7 @@ namespace Fight_for_The_Life.Views
             AddButton("- К игре -", 60, Color.White, 1, 2,
                 AnchorStyles.None, (sender, args) => ResumeGame());
 
-            string musicButtonText;
-            if (isMusicPlaying)
-                musicButtonText = "Музыка: вкл.";
-            else
-                musicButtonText = "Музыка: выкл.";
-            AddButton(musicButtonText, 40, Color.White, 0, 5, 
-                AnchorStyles.Left, (sender, args) => ManageMusic(sender));
+            AddMusicButton(40);
 
             timer.Stop();
         }
@@ -453,6 +496,8 @@ namespace Fight_for_The_Life.Views
             {
                 if (args.KeyCode == Keys.Escape)
                     PauseGame();
+                if (args.KeyCode == Keys.Space)
+                    game.Sperm.Core.Shot(game.GetVelocityInPixelsPerSecond());
             };
             KeyDown += onKeyDown;
             timer.Start();
@@ -488,13 +533,12 @@ namespace Fight_for_The_Life.Views
                     game.MagnetMaxTimeInSeconds += 5;
                 else if (item == ItemToBuy.ShieldMaxTime)
                     game.ShieldMaxTimeInSeconds += 5;
-                else
+                else if (item == ItemToBuy.ScoreCoefficient)
                     game.ScoreCoefficient += 0.5;
+                else
+                    game.ExtraLifeAmount++;
 
-                File.WriteAllBytes(
-                    Path.Combine(Directory.GetCurrentDirectory(), "save.dat"),
-                    Encoding.Unicode.GetBytes(SaveData));
-
+                Save();
                 UpdateShopButtons();
                 Invalidate();
             }
@@ -536,8 +580,29 @@ namespace Fight_for_The_Life.Views
             AddButton("Множитель очков + 0.5\n(тек. x" + game.ScoreCoefficient + ")",
                 40, Color.Black, 1, 3, AnchorStyles.Left,
                 (sender, args) => TryBuy(game.ScoreCoefficientCost, ItemToBuy.ScoreCoefficient));
+
+            AddButton("Дополнительные жизни + 1\n(тек. " + game.ExtraLifeAmount + ", макс. 5)",
+                40, Color.Black, 1, 4, AnchorStyles.Left,
+                (sender, args) => TryBuy(Game.ExtraLifeCost, ItemToBuy.ExtraLife));
         }
 
+        private void AddMusicButton(int size)
+        {
+            string musicButtonText;
+            if (isMusicPlaying)
+                musicButtonText = "Музыка: вкл.";
+            else
+                musicButtonText = "Музыка: выкл.";
+            AddButton(musicButtonText, size, Color.White, 0, 5,
+                AnchorStyles.Left, (sender, args) => ManageMusic(sender));
+        }
+
+        private void Save()
+        {
+            File.WriteAllBytes(
+                Path.Combine(Directory.GetCurrentDirectory(), "save.dat"),
+                Encoding.Unicode.GetBytes(SaveData));
+        }
         protected override CreateParams CreateParams
         {
             get

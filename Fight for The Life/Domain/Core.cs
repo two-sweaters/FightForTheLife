@@ -64,7 +64,7 @@ namespace Fight_for_The_Life.Domain
 
         public void PickUp()
         {
-            if (State == CoreState.Stopped)
+            if (State == CoreState.Stopped || sperm.IsInvulnerable)
             {
                 timeAfterShotInSeconds = 0;
                 flightTimeInSeconds = 0;

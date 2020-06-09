@@ -141,6 +141,26 @@ namespace Fight_for_The_Life.Properties {
         }
         
         /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap FiveLives {
+            get {
+                object obj = ResourceManager.GetObject("FiveLives", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap FourLives {
+            get {
+                object obj = ResourceManager.GetObject("FourLives", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
         public static System.Drawing.Icon GameIcon {
@@ -222,6 +242,16 @@ namespace Fight_for_The_Life.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap OneLife {
+            get {
+                object obj = ResourceManager.GetObject("OneLife", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Pill {
             get {
                 object obj = ResourceManager.GetObject("Pill", resourceCulture);
@@ -272,9 +302,29 @@ namespace Fight_for_The_Life.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap ThreeLives {
+            get {
+                object obj = ResourceManager.GetObject("ThreeLives", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Tutorial {
             get {
                 object obj = ResourceManager.GetObject("Tutorial", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap TwoLives {
+            get {
+                object obj = ResourceManager.GetObject("TwoLives", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

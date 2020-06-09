@@ -21,6 +21,11 @@ namespace Fight_for_The_Life.Views
         public readonly Bitmap Dna;
         public readonly Bitmap Shield;
         public readonly Bitmap Magnet;
+        public readonly Bitmap OneLife;
+        public readonly Bitmap TwoLives;
+        public readonly Bitmap ThreeLives;
+        public readonly Bitmap FourLives;
+        public readonly Bitmap FiveLives;
         public readonly Dictionary<Type, Bitmap> GameObjectsImages = new Dictionary<Type, Bitmap>();
 
         public GameImages(double widthCoefficient, double heightCoefficient)
@@ -83,6 +88,26 @@ namespace Fight_for_The_Life.Views
             SpermWithShieldAndMagnet = new Bitmap(Resources.MainSpermWithShieldAndMagnet, 
                 (int)(Resources.Sperm.Width * widthCoefficient),
                 (int)(Resources.Sperm.Height * heightCoefficient));
+
+            OneLife = new Bitmap(Resources.OneLife,
+                (int)(Resources.OneLife.Width * widthCoefficient),
+                (int)(Resources.OneLife.Height * heightCoefficient));
+
+            TwoLives = new Bitmap(Resources.TwoLives,
+                (int)(Resources.OneLife.Width * widthCoefficient),
+                (int)(Resources.OneLife.Height * heightCoefficient));
+
+            ThreeLives = new Bitmap(Resources.ThreeLives,
+                (int)(Resources.OneLife.Width * widthCoefficient),
+                (int)(Resources.OneLife.Height * heightCoefficient));
+
+            FourLives = new Bitmap(Resources.FourLives,
+                (int)(Resources.OneLife.Width * widthCoefficient),
+                (int)(Resources.OneLife.Height * heightCoefficient));
+
+            FiveLives = new Bitmap(Resources.FiveLives,
+                (int)(Resources.OneLife.Width * widthCoefficient),
+                (int)(Resources.OneLife.Height * heightCoefficient));
         }
     }
 }

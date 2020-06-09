@@ -4,6 +4,7 @@
     {
         ScoreCoefficient,
         MagnetMaxTime,
-        ShieldMaxTime
+        ShieldMaxTime, 
+        ExtraLife
     }
 }

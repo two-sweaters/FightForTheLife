@@ -28,10 +28,13 @@ namespace Fight_for_The_Life.Domain
             }
         }
 
-        public double gameTimeInSeconds { get; private set; }
-        public double shieldTimeInSeconds { get; private set; }
-        public double magnetTimeInSeconds { get; private set; }
-        public double emptyFieldTime { get; private set; }
+        public double GameTimeInSeconds { get; private set; }
+        public double ShieldTimeInSeconds { get; private set; }
+        public double MagnetTimeInSeconds { get; private set; }
+        public double InvulnerableTimeInSeconds { get; private set; }
+        private const int InvulnerableMaxTimeInSeconds = 1;
+        public const int ExtraLifeCost = 80;
+        public double EmptyFieldTime { get; private set; }
         private static readonly double StartVelocity = (int) (FieldWidth / 4);
         private const double AccelerationCoefficient = 1.25;
         public readonly Sperm Sperm = new Sperm();
@@ -41,6 +44,7 @@ namespace Fight_for_The_Life.Domain
         public double ScoreCoefficient { get; set; }
         public int ShieldMaxTimeInSeconds { get; set; }
         public int MagnetMaxTimeInSeconds { get; set; }
+        public int ExtraLifeAmount { get; set; }
         public int DnaAmount { get; set; }
         public int HighestScore { get; private set; }
         public int ScoreCoefficientCost => (int)(ScoreCoefficient / 0.5 - 2) * 5 + 25;
@@ -65,19 +69,20 @@ namespace Fight_for_The_Life.Domain
         }
 
         public Game(int dnaAmount, int highestScore, double scoreCoefficient, 
-            int shieldMaxTimeInSeconds, int magnetMaxTimeInSeconds)
+            int shieldMaxTimeInSeconds, int magnetMaxTimeInSeconds, int extraLifeAmount)
         {
             DnaAmount = dnaAmount;
             HighestScore = highestScore;
             ScoreCoefficient = scoreCoefficient;
             ShieldMaxTimeInSeconds = shieldMaxTimeInSeconds;
             MagnetMaxTimeInSeconds = magnetMaxTimeInSeconds;
+            ExtraLifeAmount = extraLifeAmount;
         }
 
         public int GetScore()
         {
-            var segmentsAmount = (int)(gameTimeInSeconds / 15);
-            var lastSegmentTime = gameTimeInSeconds % 15;
+            var segmentsAmount = (int)(GameTimeInSeconds / 15);
+            var lastSegmentTime = GameTimeInSeconds % 15;
             var distance = 0.0;
             var velocity = StartVelocity;
 
@@ -94,17 +99,17 @@ namespace Fight_for_The_Life.Domain
 
         public void IncreaseGameTimeInSeconds(double seconds)
         {
-            gameTimeInSeconds += seconds;
+            GameTimeInSeconds += seconds;
             foreach (var gameObject in GameObjects)
             {
                 gameObject.TimeAliveInSeconds += seconds;
             }
 
             if (Sperm.IsShieldActivated)
-                shieldTimeInSeconds += seconds;
+                ShieldTimeInSeconds += seconds;
 
             if (Sperm.IsMagnetActivated)
-                magnetTimeInSeconds += seconds;
+                MagnetTimeInSeconds += seconds;
 
             if (Sperm.Core.State != CoreState.InsideSperm)
                 Sperm.Core.timeAfterShotInSeconds += seconds;
@@ -113,12 +118,15 @@ namespace Fight_for_The_Life.Domain
                 Sperm.Core.flightTimeInSeconds += seconds;
 
             if (GameObjects.Count == 0)
-                emptyFieldTime += seconds;
+                EmptyFieldTime += seconds;
+
+            if (Sperm.IsInvulnerable)
+                InvulnerableTimeInSeconds += seconds;
         }
 
         public double GetVelocityInPixelsPerSecond()
         {
-            return Math.Pow(AccelerationCoefficient, (int)(gameTimeInSeconds / 15)) * StartVelocity;
+            return Math.Pow(AccelerationCoefficient, (int)(GameTimeInSeconds / 15)) * StartVelocity;
         }
 
         public void UpdateGame()
@@ -127,14 +135,17 @@ namespace Fight_for_The_Life.Domain
             if (score > HighestScore)
                 HighestScore = score;
 
-            if (shieldTimeInSeconds > ShieldMaxTimeInSeconds)
+            if (ShieldTimeInSeconds > ShieldMaxTimeInSeconds)
                 Sperm.IsShieldActivated = false;
 
-            if (magnetTimeInSeconds > MagnetMaxTimeInSeconds)
+            if (MagnetTimeInSeconds > MagnetMaxTimeInSeconds)
                 Sperm.IsMagnetActivated = false;
 
+            if (InvulnerableTimeInSeconds > InvulnerableMaxTimeInSeconds)
+                Sperm.IsInvulnerable = false;
+
             var number = rand.Next(40);
-            if (number == 1 || emptyFieldTime > 3)
+            if (number == 1 || EmptyFieldTime > 3)
                 GenerateRandomGameObject();
 
             CheckAndUpdateCore();
@@ -155,8 +166,14 @@ namespace Fight_for_The_Life.Domain
                 {
                     if (objectModel.X > FieldWidth)
                     {
-                        IsGameOver = true;
-                        return;
+                        if (ExtraLifeAmount == 0)
+                        {
+                            IsGameOver = true;
+                            return;
+                        }
+                        ExtraLifeAmount--;
+                        Sperm.IsInvulnerable = true;
+                        InvulnerableTimeInSeconds = 0;
                     }
 
                     if (coreModel.IntersectsWith(objectModel) && Sperm.Core.State != CoreState.InsideSperm)
@@ -171,7 +188,7 @@ namespace Fight_for_The_Life.Domain
                     {
                         newGameObjects.Remove(gameObject);
                         Sperm.IsShieldActivated = true;
-                        shieldTimeInSeconds = 0;
+                        ShieldTimeInSeconds = 0;
                     }
                 }
                 else if (gameObject is Magnet)
@@ -180,7 +197,7 @@ namespace Fight_for_The_Life.Domain
                     {
                         newGameObjects.Remove(gameObject);
                         Sperm.IsMagnetActivated = true;
-                        magnetTimeInSeconds = 0;
+                        MagnetTimeInSeconds = 0;
                     }
                 }
                 else if (gameObject is Dna)
@@ -193,10 +210,16 @@ namespace Fight_for_The_Life.Domain
                 }
                 else 
                 {
-                    if (objectModel.IntersectsWith(Sperm.Model) && !Sperm.IsShieldActivated)
+                    if (objectModel.IntersectsWith(Sperm.Model) && !Sperm.IsShieldActivated && !Sperm.IsInvulnerable)
                     {
-                        IsGameOver = true;
-                        return;
+                        if (ExtraLifeAmount == 0)
+                        {
+                            IsGameOver = true;
+                            return;
+                        }
+                        ExtraLifeAmount--;
+                        Sperm.IsInvulnerable = true;
+                        InvulnerableTimeInSeconds = 0;
                     }
                 }
 
@@ -214,8 +237,15 @@ namespace Fight_for_The_Life.Domain
             {
                 if (coreModel.X < 0 || coreModel.X > FieldWidth)
                 {
-                    IsGameOver = true;
-                    return;
+                    if (ExtraLifeAmount == 0)
+                    {
+                        IsGameOver = true;
+                        return;
+                    }
+                    ExtraLifeAmount--;
+                    Sperm.IsInvulnerable = true;
+                    InvulnerableTimeInSeconds = 0;
+                    Sperm.Core.PickUp();
                 }
                 if (Sperm.Core.State == CoreState.Stopped && Sperm.Model.IntersectsWith(coreModel))
                     Sperm.Core.PickUp();

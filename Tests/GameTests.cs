@@ -115,10 +115,10 @@ namespace Tests
             game.Sperm.IsShieldActivated = true;
             game.Sperm.Core.Shot(0);
             game.IncreaseGameTimeInSeconds(1);
-            Assert.AreEqual(1, game.gameTimeInSeconds);
-            Assert.AreEqual(1, game.emptyFieldTime);
-            Assert.AreEqual(1, game.magnetTimeInSeconds);
-            Assert.AreEqual(1, game.shieldTimeInSeconds);
+            Assert.AreEqual(1, game.GameTimeInSeconds);
+            Assert.AreEqual(1, game.EmptyFieldTime);
+            Assert.AreEqual(1, game.MagnetTimeInSeconds);
+            Assert.AreEqual(1, game.ShieldTimeInSeconds);
             Assert.AreEqual(1, game.Sperm.Core.flightTimeInSeconds);
             Assert.AreEqual(1, game.Sperm.Core.timeAfterShotInSeconds);
             var blood = new Blood(0, 0);
